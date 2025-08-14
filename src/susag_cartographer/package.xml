@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>susag_cartographer</name>
+  <version>2.3.3</version>
+  <description>
+    ROS 2 launch scripts for cartographer
+  </description>
+  <maintainer email="saransrimathi590@gmail.com">Pyo</maintainer>
+  <license>Apache 2.0</license>
+  <author email="thlim@robotis.com">Darby Lim</author>
+  <author email="pyo@robotis.com">Pyo</author>
+  <author email="willson@robotis.com">Will Son</author>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <exec_depend>cartographer_ros</exec_depend>
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
