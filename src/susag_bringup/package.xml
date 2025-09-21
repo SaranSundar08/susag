@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>susag_bringup</name>
+  <version>0.0.1</version>
+  <description>Bringup for SUSAG robot</description>
+  <maintainer email="saransrimathi590@gmail.com">Saran</maintainer>
+  <license>BSD-3-Clause</license>
+
+  <!-- build tool -->
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <!-- launch infra -->
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+
+  <!-- you already had these (keep them if you still use them elsewhere) -->
+  <exec_depend>rtabmap_slam</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>pcl_ros</exec_depend>
+
+  <!-- needed for grid_map pipeline -->
+  <exec_depend>rclcpp_components</exec_depend>          <!-- component_container -->
+  <exec_depend>grid_map_pcl</exec_depend>
+  <exec_depend>grid_map_visualization</exec_depend>
+  <exec_depend>grid_map_msgs</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+
+  <!-- optional, only if your launch starts RViz -->
+  <exec_depend>rviz2</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

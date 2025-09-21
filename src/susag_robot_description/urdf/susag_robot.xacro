@@ -119,6 +119,7 @@
   </visual>
   <collision>
     <origin xyz="0.21 -0.3 -0.1" rpy="0 0 0"/>
+    <origin xyz="0.21 -0.3 -0.1" rpy="0 0 0"/>
     <geometry>
       <mesh filename="file://$(find susag_robot_description)/meshes/left_wheel_back_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
@@ -166,6 +167,19 @@
     </geometry>
   </collision>
 </link>
+
+<!-- Optical frame for rgbd camera (REP-103/120: x-right, y-down, z-forward) -->
+<link name="rgbdcam_1_optical"/>
+
+<joint name="rgbdcam_1_optical_joint" type="fixed">
+  <parent link="rgbdcam_1"/>
+  <child link="rgbdcam_1_optical"/>
+
+  <!-- Position this at the optical center of the sensor.
+       Start with zero offset, then tune xyz as needed. -->
+  <origin xyz="0 0 0" rpy="-1.570796 0 -1.570796"/>
+</joint>
+
 
 <joint name="right_wheel_back_joint" type="continuous">
   <origin xyz="-0.21 -0.3 0.1" rpy="0 0 0"/>

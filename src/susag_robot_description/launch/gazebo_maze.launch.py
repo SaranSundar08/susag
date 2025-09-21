@@ -50,7 +50,7 @@ def generate_launch_description():
         ]),
         launch_arguments={
             'pause': 'false',
-            'world': os.path.join(share_dir, 'worlds', 'test_world.world')
+            'world': os.path.join(share_dir, 'worlds', 'maze_world.world')
         }.items()
     )
 
