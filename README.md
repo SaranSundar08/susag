@@ -1,4 +1,4 @@
-# SUSAG Project — ROS 2 Humble + Gazebo Classic
+# SUSAG Project
 
 > Last known-stable: **running as of *21/09/25*** (still needs tuning for smoother robot behavior).
 > Simulator: **Gazebo Classic** (deprecated upstream, but used here intentionally).
