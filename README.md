@@ -1,7 +1,7 @@
 # SUSAG Project
 
-> Last known-stable: **running as of *21/09/25*** (still needs tuning for smoother robot behavior).
-> Simulator: **Gazebo Classic** (deprecated upstream, but used here intentionally).
+> Last known-stable: **running as of *22/09/25*** <br>
+> Simulator: **Gazebo Classic** (deprecated upstream, but used here intentionally).<br>
 > ROS distro: **ROS 2 Humble** (Ubuntu 22.04 recommended).
 
 
@@ -12,8 +12,6 @@
 * `colcon`, `vcstool`, `rosdep`
 
 > Tip: avoid mixing Conda with ROS—PYTHONPATH conflicts are common.
-
-
 
 
 ## 2) Quick Start (fresh workspace)
