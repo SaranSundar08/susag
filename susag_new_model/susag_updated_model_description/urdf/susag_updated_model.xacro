@@ -1,0 +1,221 @@
+<?xml version="1.0" ?>
+<robot name="susag_updated_model" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+<xacro:include filename="$(find susag_updated_model_description)/urdf/materials.xacro" />
+<xacro:include filename="$(find susag_updated_model_description)/urdf/susag_updated_model.trans" />
+<xacro:include filename="$(find susag_updated_model_description)/urdf/susag_updated_model.gazebo" />
+<link name="base_link">
+  <inertial>
+    <origin xyz="0.0009712747698901402 0.0 0.21010916566289983" rpy="0 0 0"/>
+    <mass value="2.0"/>
+    <inertia ixx="16.290402" iyy="40.746842" izz="52.606689" ixy="0.0" iyz="0.0" ixz="-0.038454"/>
+  </inertial>
+  <visual>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="file://$(find susag_updated_model_description)/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+  </visual>
+  <collision>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="file://$(find susag_updated_model_description)/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="rear_right_wheel_1">
+  <inertial>
+    <origin xyz="-3.1807889655510735e-14 0.04999999999999999 -5.551115123125783e-17" rpy="0 0 0"/>
+    <mass value="4.0"/>
+    <inertia ixx="0.491633" iyy="0.87867" izz="0.491633" ixy="-0.0" iyz="0.0" ixz="-0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="0.2665 0.37 -0.165" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="file://$(find susag_updated_model_description)/meshes/rear_right_wheel_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+  </visual>
+  <collision>
+    <origin xyz="0.2665 0.37 -0.165" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="file://$(find susag_updated_model_description)/meshes/rear_right_wheel_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="front_right_wheel_1">
+  <inertial>
+    <origin xyz="-3.191891195797325e-14 0.04999999999999999 -5.551115123125783e-17" rpy="0 0 0"/>
+    <mass value="4.0"/>
+    <inertia ixx="0.491633" iyy="0.87867" izz="0.491633" ixy="0.0" iyz="0.0" ixz="-0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="-0.2665 0.37 -0.165" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="file://$(find susag_updated_model_description)/meshes/front_right_wheel_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+  </visual>
+  <collision>
+    <origin xyz="-0.2665 0.37 -0.165" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="file://$(find susag_updated_model_description)/meshes/front_right_wheel_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="front_left_wheel_1">
+  <inertial>
+    <origin xyz="-3.191891195797325e-14 -0.04999999999999999 -5.551115123125783e-17" rpy="0 0 0"/>
+    <mass value="4.0"/>
+    <inertia ixx="0.491633" iyy="0.87867" izz="0.491633" ixy="-0.0" iyz="-0.0" ixz="-0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="-0.2665 -0.37 -0.165" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="file://$(find susag_updated_model_description)/meshes/front_left_wheel_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+  </visual>
+  <collision>
+    <origin xyz="-0.2665 -0.37 -0.165" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="file://$(find susag_updated_model_description)/meshes/front_left_wheel_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="rear_left_wheel_1">
+  <inertial>
+    <origin xyz="-3.186340080674199e-14 -0.04999999999999999 -5.551115123125783e-17" rpy="0 0 0"/>
+    <mass value="4.0"/>
+    <inertia ixx="0.491633" iyy="0.87867" izz="0.491633" ixy="0.0" iyz="-0.0" ixz="-0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="0.2665 -0.37 -0.165" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="file://$(find susag_updated_model_description)/meshes/rear_left_wheel_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+  </visual>
+  <collision>
+    <origin xyz="0.2665 -0.37 -0.165" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="file://$(find susag_updated_model_description)/meshes/rear_left_wheel_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="real_sense_1">
+  <inertial>
+    <origin xyz="0.012500000000000011 0.0 0.0" rpy="0 0 0"/>
+    <mass value="0.1"/>
+    <inertia ixx="0.008377" iyy="0.000329" izz="0.008237" ixy="0.0" iyz="0.0" ixz="-0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="-0.436 -0.0 -0.27" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="file://$(find susag_updated_model_description)/meshes/real_sense_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+  </visual>
+  <collision>
+    <origin xyz="-0.436 -0.0 -0.27" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="file://$(find susag_updated_model_description)/meshes/real_sense_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="rear_lidar_1">
+  <inertial>
+    <origin xyz="0.0 0.0 0.009999999999999898" rpy="0 0 0"/>
+    <mass value="0.1"/>
+    <inertia ixx="8.9e-05" iyy="8.9e-05" izz="0.000152" ixy="-0.0" iyz="0.0" ixz="0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="0.381 -0.0 -0.34" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="file://$(find susag_updated_model_description)/meshes/rear_lidar_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+  </visual>
+  <collision>
+    <origin xyz="0.381 -0.0 -0.34" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="file://$(find susag_updated_model_description)/meshes/rear_lidar_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="front_lidar_1">
+  <inertial>
+    <origin xyz="5.6773423184885985e-09 -5.7697137078703364e-18 0.009999999999999953" rpy="0 0 0"/>
+    <mass value="0.1"/>
+    <inertia ixx="8.9e-05" iyy="8.9e-05" izz="0.000152" ixy="-0.0" iyz="0.0" ixz="-0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="-0.381 -0.0 -0.34" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="file://$(find susag_updated_model_description)/meshes/front_lidar_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="silver"/>
+  </visual>
+  <collision>
+    <origin xyz="-0.381 -0.0 -0.34" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="file://$(find susag_updated_model_description)/meshes/front_lidar_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<joint name="rear_wheel_right_joint" type="continuous">
+  <origin xyz="-0.2665 -0.37 0.165" rpy="0 0 0"/>
+  <parent link="base_link"/>
+  <child link="rear_right_wheel_1"/>
+  <axis xyz="0.0 1.0 0.0"/>
+</joint>
+
+<joint name="front_wheel_right_joint" type="continuous">
+  <origin xyz="0.2665 -0.37 0.165" rpy="0 0 0"/>
+  <parent link="base_link"/>
+  <child link="front_right_wheel_1"/>
+  <axis xyz="0.0 1.0 0.0"/>
+</joint>
+
+<joint name="front_wheel_left_joint" type="continuous">
+  <origin xyz="0.2665 0.37 0.165" rpy="0 0 0"/>
+  <parent link="base_link"/>
+  <child link="front_left_wheel_1"/>
+  <axis xyz="0.0 1.0 0.0"/>
+</joint>
+
+<joint name="rear_wheel_left_joint" type="continuous">
+  <origin xyz="-0.2665 0.37 0.165" rpy="0 0 0"/>
+  <parent link="base_link"/>
+  <child link="rear_left_wheel_1"/>
+  <axis xyz="0.0 1.0 0.0"/>
+</joint>
+
+<joint name="real_sense_joint" type="fixed">
+  <origin xyz="0.436 0.0 0.27" rpy="0 0 0"/>
+  <parent link="base_link"/>
+  <child link="real_sense_1"/>
+</joint>
+
+<joint name="lidar_rear_joint" type="fixed">
+  <origin xyz="-0.381 0.0 0.34" rpy="0 0 0"/>
+  <parent link="base_link"/>
+  <child link="rear_lidar_1"/>
+</joint>
+
+<joint name="lidar_front_joint" type="fixed">
+  <origin xyz="0.381 0.0 0.34" rpy="0 0 0"/>
+  <parent link="base_link"/>
+  <child link="front_lidar_1"/>
+</joint>
+
+</robot>
