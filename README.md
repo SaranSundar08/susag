@@ -25,7 +25,7 @@ mkdir -p ~/susag_ws/src
 cd ~/susag_ws/src
 
 # 2) Clone the repo
-git clone <THIS_REPO_URL> 
+git clone https://github.com/SaranSundar08/susag.git 
 
 # 3) Install system deps via rosdep
 sudo apt update
