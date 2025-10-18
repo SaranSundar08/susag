@@ -26,6 +26,10 @@ cd ~/susag_ws/src
 
 # 2) Clone the repo
 git clone https://github.com/SaranSundar08/susag.git 
+git fetch origin
+git status #to see which branch you are currently under main directory is stable things will be only pushed to main only after testing and verification
+git checkout saran
+
 
 # 3) Install system deps via rosdep
 sudo apt update
