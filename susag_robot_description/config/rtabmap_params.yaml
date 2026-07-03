@@ -1,0 +1,29 @@
+rtabmap:
+  ros__parameters:
+    use_sim_time: true
+
+    # Frames
+    frame_id: "base_link"
+    map_frame_id: "map"
+    odom_frame_id: "odom"
+
+    # Subscribe to RGBD and odom
+    subscribe_rgbd: true
+    subscribe_depth: false
+    subscribe_scan: false
+
+    # Core SLAM / loop closure behaviour
+    Mem/IncrementalMemory: "true"
+    Mem/InitWMWithAllNodes: "false"
+    RGBD/LoopClosureReextractFeatures: "true"
+    RGBD/OptimizeMaxError: "3.0"
+
+    # Loop closure detection
+    Kp/MaxFeatures: "1000"
+    Vis/MinInliers: "15"
+    Vis/CorFlowFiltering: "true"
+
+    # Save/visualization
+    Rtabmap/DetectionRate: "1.0"         # Hz (how often to try loop closure)
+    Rtabmap/TimeThr: "0"                 # no hard time limit
+    Reg/Strategy: "0"                    # 0=Visual, 1=ICP, 2=Visual+ICP

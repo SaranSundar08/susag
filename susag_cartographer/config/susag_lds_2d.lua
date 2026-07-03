@@ -5,10 +5,10 @@ options = {
   map_builder = MAP_BUILDER,
   trajectory_builder = TRAJECTORY_BUILDER,
   map_frame = "map",
-  tracking_frame = "imu_link",
-  published_frame = "odom",
+  tracking_frame = "base_link",
+  published_frame = "odom",      -- wheel odom owns odom->base_link; cartographer publishes map->odom
   odom_frame = "odom",
-  provide_odom_frame = false, --as we have odom frame from diff drive
+  provide_odom_frame = false,    -- diff_drive provides odom->base_link (publish_odom_tf=true)
   publish_frame_projected_to_2d = true,
   use_odometry = true,
   use_nav_sat = false,

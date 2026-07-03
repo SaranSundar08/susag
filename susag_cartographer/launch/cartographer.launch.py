@@ -12,8 +12,12 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    use_sim_time = LaunchConfiguration('use_sim_time', default='true')
+    use_sim_time = LaunchConfiguration('use_sim_time', default='false')
     use_rviz = LaunchConfiguration('use_rviz', default='true')
+
+    #topics for two lidars
+    # front_scan_topic = LaunchConfiguration('front_scan_topic', default='/scan')
+    
     susag_cartographer_prefix = get_package_share_directory('susag_cartographer')
     cartographer_config_dir = LaunchConfiguration('cartographer_config_dir', default=os.path.join(
                                                   susag_cartographer_prefix, 'config'))
@@ -37,7 +41,7 @@ def generate_launch_description():
             description='Name of lua file for cartographer'),
         DeclareLaunchArgument(
             'use_sim_time',
-            default_value='true',
+            default_value='false',
             description='Use simulation (Gazebo) clock if true'),
 
         Node(
@@ -46,8 +50,15 @@ def generate_launch_description():
             name='cartographer_node',
             output='screen',
             parameters=[{'use_sim_time': use_sim_time}],
-            arguments=['-configuration_directory', cartographer_config_dir,
-                       '-configuration_basename', configuration_basename]),
+            arguments=[
+                '-configuration_directory', cartographer_config_dir,
+                '-configuration_basename', configuration_basename
+            ],
+            # remappings=[
+            #     ('scan', '/scan'),
+            #     ('odom', '/Odometry'),
+            # ]
+        ),
 
         DeclareLaunchArgument(
             'resolution',

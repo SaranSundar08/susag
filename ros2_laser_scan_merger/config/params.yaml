@@ -1,0 +1,79 @@
+/ros2_laser_scan_merger:
+  ros__parameters:
+    # Geometry / placement (matching your URDF, in meters)
+    laser1XOff: 0.381        # front lidar x
+    laser1YOff: 0.0
+    laser1ZOff: 0.34
+    laser2XOff: -0.381       # rear lidar x
+    laser2YOff: 0.0
+    laser2ZOff: 0.34
+
+    # Orientation in degrees (yaw around z)
+    laser1Alpha: 0.0         # front facing forward
+    laser2Alpha: 180.0       # rear facing backward
+
+    # Angular coverage of each lidar (in degrees)
+    # Option 1: full 360° from both (simpler, a bit redundant but safe)
+    laser1AngleMin: -180.0
+    laser1AngleMax:  180.0
+    laser2AngleMin: -180.0
+    laser2AngleMax:  180.0
+
+    # (If you want semi-circles instead, you can later do:
+    #   front: -90..+90, rear: -90..+90 in its own frame.)
+
+    # Don’t flip or invert unless you see obvious mirroring
+    flip1: false
+    flip2: false
+    inverse1: false
+    inverse2: false
+
+    # Colors only affect debug visualization
+    laser1R: 255
+    laser1G: 0
+    laser1B: 0
+    laser1Alpha: 0.0         
+    laser2R: 0
+    laser2G: 0
+    laser2B: 255
+    laser2Alpha: 180.0       # keep as orientation if node uses it that way
+
+    # Topics
+    scanTopic1: /front_scan
+    scanTopic2: /rear_scan
+    pointCloudTopic: cloud_in
+    pointCloutFrameId: base_link   # merged cloud in base_link frame
+
+    show1: true
+    show2: true
+
+    # QoS + time
+    qos_overrides./parameter_events.publisher.depth: 1000
+    qos_overrides./parameter_events.publisher.reliability: best_effort
+    use_sim_time: true
+
+/pointcloud_to_laserscan:
+  ros__parameters:
+    angle_increment: 0.0087
+    # angle_max: 1.5708
+    # angle_min: -1.5708
+    angle_max: 3.14
+    angle_min: -3.14
+    inf_epsilon: 1.0
+    max_height: 1.0
+    min_height: 0.0
+    qos_overrides:
+      /parameter_events:
+        publisher:
+          depth: 1000
+          # durability: volatile
+          # history: keep_last
+          reliability: best_effort
+    queue_size: 16
+    range_max: 10.0
+    range_min: 0.35
+    scan_time: 0.3333
+    target_frame: base_link
+    transform_tolerance: 0.01
+    use_inf: true
+    use_sim_time: true
