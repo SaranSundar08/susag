@@ -6,6 +6,7 @@ from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import PathJoinSubstitution
 from launch.substitutions import LaunchConfiguration
+from launch.conditions import IfCondition
 import os
 import xacro
 from ament_index_python.packages import get_package_share_directory
@@ -77,13 +78,28 @@ def generate_launch_description():
         output='screen'
     )
 
+    # Front + rear scans are separate in sim; merge them into a single /scan
+    # (ros2_laser_scan_merger + pointcloud_to_laserscan). Toggle with merge:=false.
+    laser_merger = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            PathJoinSubstitution([
+                FindPackageShare('ros2_laser_scan_merger'),
+                'launch',
+                'merge_2_scan.launch.py'
+            ])
+        ]),
+        condition=IfCondition(LaunchConfiguration('merge'))
+    )
 
     return LaunchDescription([
+        DeclareLaunchArgument('use_sim_time', default_value='true'),
+        DeclareLaunchArgument('merge', default_value='true',
+                              description='Run the front/rear laser scan merger'),
         robot_state_publisher_node,
         joint_state_publisher_node,
         gazebo_server,
         gazebo_client,
         urdf_spawn_node,
-        DeclareLaunchArgument('use_sim_time', default_value='true')
+        laser_merger,
     ])
     
