@@ -20,7 +20,7 @@ amcl:
     max_beams: 60
     max_particles: 2000
     min_particles: 500
-    odom_frame_id: "camera_init"
+    odom_frame_id: "odom"
     pf_err: 0.05
     pf_z: 0.99
     recovery_alpha_fast: 0.0
@@ -120,31 +120,24 @@ controller_server:
       xy_goal_tolerance: 0.25
       yaw_goal_tolerance: 0.25
 
-    # MPPI parameters
+    # Amoeba (shape-conditioned MPPI) parameters
     FollowPath:
-      plugin: "nav2_mppi_controller::MPPIController"
+      plugin: "nav2_amoeba_mppi_controller::AmoebaController"
 
-      # --- SLIP MPPI variant selection ---
-      mppi_variant: "vanilla"         # vanilla | log | lowpass | biased
-
-      # LP-MPPI knobs (ignored unless variant == lowpass)
-      lowpass_cutoff_hz: 2.0
-      lowpass_order: 1
-      
-      # Biased-MPPI knobs
-      bias_strength: 0.5             # fraction of the 2000 samples re-centered on the ancillary
-      ancillary_type: "braking"      # pursuit | braking (which ancillary to bias toward)
-      # -- pursuit ancillary knobs (used when ancillary_type == pursuit) --
-      bias_lookahead_dist: 0.6       # pursuit lookahead point distance (m)
-      bias_gain: 1.5                 # pursuit heading P-gain (rad/s per rad of error)
-      # -- braking/CBF ancillary knobs (used when ancillary_type == braking) --
-      brake_gain: 1.5                # obstacle-repulsion steering P-gain (rad/s per rad)
-      brake_scan_dist: 0.3           # cost-gradient finite-difference offset (m)
-
-      # # Guided sampling: reserve N batch rows for fixed escape maneuvers (0=off).
-      # # Rear-first order: 1-3 = reverse / reverse-left / reverse-right,
-      # # 4-5 = pivot L/R, 6-7 = hard arc L/R. Works with any variant.
-      # escape_samples: 3              # 3 = the reverse maneuvers (front-blocked escape)
+      # --- Amoeba shape-conditioned sampling (this controller's core behavior) ---
+      # A forward polar gap-scan reads the obstacle silhouette from the local
+      # costmap and seeds a fraction of the batch onto the two tangent "wrap"
+      # modes (left/right around the obstacle), so the two ways around are never
+      # averaged into "drive straight in". Clear path -> plain MPPI; fully walled
+      # arc -> gentle reverse + defer to critics/global replan.
+      amoeba_bias_strength: 0.6      # rho: fraction of the 2000 samples on the wrap modes
+      amoeba_bias_gain: 1.5          # Kp: tangent bearing error -> yaw rate
+      amoeba_lookahead_dist: 0.6     # path lookahead for the toward-goal bearing (m)
+      amoeba_scan_range: 2.5         # forward ray-cast range = silhouette horizon (m)
+      amoeba_arc: 1.57               # forward half-arc scanned each side (rad, ~90 deg)
+      amoeba_num_rays: 37            # angular resolution of the polar gap-scan
+      amoeba_goal_dist: 1.0          # within this range of goal, disable amoeba (plain MPPI docks)
+      amoeba_debug: true             # publish /amoeba_debug markers (scan rays + wrap arrows)
 
       time_steps: 56
       model_dt: 0.05
@@ -169,12 +162,8 @@ controller_server:
       reset_period: 1.0 # (only in Humble)
       regenerate_noises: false
       TrajectoryVisualizer:
-        trajectory_step: 1   # fewer curves (~65) so each is distinguishable
-        time_step: 1          # render every point so noise jaggedness is visible
-      TrajectoryValidator:
-        plugin: "mppi::DefaultOptimalTrajectoryValidator"
-        collision_lookahead_time: 2.0
-        consider_footprint: false
+        trajectory_step: 25   # draw ~80 of 2000 rollouts -> the two wrap bundles become visible
+        time_step: 2          # every other point per curve, still smooth
       AckermannConstraints:
         min_turning_r: 0.2
       critics: ["ConstraintCritic", "CostCritic", "GoalCritic", "GoalAngleCritic", "PathAlignCritic", "PathFollowCritic", "PathAngleCritic", "PreferForwardCritic"]
@@ -263,23 +252,13 @@ global_costmap:
       publish_frequency: 1.0
       global_frame: map
       robot_base_frame: base_link
-
-      footprint: "[[0.40, 0.32],
-                  [0.40, -0.32],
-                  [-0.40, -0.32],
-                  [-0.40, 0.32]]"
-
+      # robot_radius: 0.3 # radius set and used, so no footprint points
+      footprint: "[[0.42, 0.34],
+                  [0.42, -0.34],
+                  [-0.42, -0.34],
+                  [-0.42, 0.34]]"
       resolution: 0.05
-
-      plugins: ["static_layer", "obstacle_layer", "stvl_global", "inflation_layer"]
-
-      static_layer:
-        plugin: "nav2_costmap_2d::StaticLayer"
-        map_subscribe_transient_local: true
-        enabled: true
-        subscribe_to_updates: true
-        transform_tolerance: 0.1
-
+      plugins: ["static_layer", "obstacle_layer", "inflation_layer", "stvl_global"]
       obstacle_layer:
         plugin: "nav2_costmap_2d::ObstacleLayer"
         enabled: true
@@ -287,7 +266,6 @@ global_costmap:
         footprint_clearing_enabled: true
         max_obstacle_height: 2.0
         combination_method: 1
-
         scan:
           topic: /scan
           obstacle_max_range: 2.5
@@ -300,7 +278,6 @@ global_costmap:
           marking: true
           data_type: "LaserScan"
           inf_is_valid: false
-
         base_scan:
           topic: /base/scan
           obstacle_max_range: 2.5
@@ -322,14 +299,13 @@ global_costmap:
         track_unknown_space: true
         publish_voxel_map: true
         transform_tolerance: 0.2
-        voxel_decay: 3.0
-        decay_model: 1
+        voxel_decay: 3.0           # faster clearing locally
+        decay_model: 1             # 0=None, 1=Linear, 2=Exponential
         combination_method: 1
         observation_sources: pointcloud
-
         pointcloud:
           data_type: PointCloud2
-          topic: /rslidar_points
+          topic: /susag/depth/depth_camera/points
           marking: true
           clearing: true
           min_z: 0.10
@@ -339,16 +315,6 @@ global_costmap:
           filter: "voxel"
           voxel_min_points: 0
           clear_after_reading: true
-
-      inflation_layer:
-        plugin: "nav2_costmap_2d::InflationLayer"
-        enabled: true
-        inflation_radius: 0.50
-        cost_scaling_factor: 1.0
-        inflate_unknown: false
-        inflate_around_unknown: true
-
-      always_send_full_costmap: true
       
 
       static_layer:
@@ -367,14 +333,13 @@ global_costmap:
         inflate_around_unknown: true
       always_send_full_costmap: true
 
-
 local_costmap:
   local_costmap:
     ros__parameters:
       use_sim_time: false
       update_frequency: 5.0
       publish_frequency: 2.0
-      global_frame: camera_init
+      global_frame: odom
       robot_base_frame: base_link
       footprint_padding: 0.08
       rolling_window: true
@@ -382,10 +347,10 @@ local_costmap:
       height: 3
       resolution: 0.05
       # robot_radius: 0.3 # radius set and used, so no footprint points
-      footprint: "[[0.40, 0.32],
-                  [0.40, -0.32],
-                  [-0.40, -0.32],
-                  [-0.40, 0.32]]"
+      footprint: "[[0.42, 0.34],
+                  [0.42, -0.34],
+                  [-0.42, -0.34],
+                  [-0.42, 0.34]]"
       resolution: 0.05
       plugins: ["obstacle_layer", "stvl_local", "inflation_layer"]
 
@@ -493,7 +458,7 @@ recoveries_server:
       plugin: "nav2_recoveries/BackUp"
     wait:
       plugin: "nav2_recoveries/Wait"
-    global_frame: camera_init
+    global_frame: odom
     robot_base_frame: base_link
     transform_timeout: 0.1
     use_sim_time: false
@@ -521,7 +486,7 @@ velocity_smoother:
     smoothing_frequency: 20.0
     scale_velocities: False
     feedback: "OPEN_LOOP"
-    max_velocity: [2.5, 0.0, 2.5]
+    max_velocity: [2.0, 0.0, 2.5]
     min_velocity: [-0.5, 0.0, -2.5]
     max_accel: [3.5, 0.0, 3.2]
     max_decel: [-2.5, 0.0, -3.2]

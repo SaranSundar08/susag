@@ -29,7 +29,7 @@ def generate_launch_description():
     )
 
     nav2_config_path = PathJoinSubstitution(
-        [FindPackageShare('susag_nav2'), 'param', 'navigation_sim.yaml']
+        [FindPackageShare('susag_nav2'), 'param', 'navigation.yaml']
     )
 
     return LaunchDescription([
