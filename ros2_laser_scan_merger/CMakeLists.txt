@@ -19,6 +19,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(message_filters REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(pcl_conversions REQUIRED)
 find_package(rcl_interfaces REQUIRED)
@@ -37,6 +38,7 @@ ament_target_dependencies(ros2_laser_scan_merger
   rclcpp 
   std_msgs 
   sensor_msgs
+  message_filters
   pcl_conversions
   rcl_interfaces
   rcutils

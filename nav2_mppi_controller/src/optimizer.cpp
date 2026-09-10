@@ -21,11 +21,14 @@
 #include <vector>
 #include <cmath>
 #include <algorithm>
+#include <array>
+#include <utility>
 #include <xtensor/xmath.hpp>
 #include <xtensor/xrandom.hpp>
 #include <xtensor/xnoalias.hpp>
 
 #include "nav2_costmap_2d/costmap_filters/filter_values.hpp"
+#include "nav2_costmap_2d/cost_values.hpp"
 
 namespace mppi
 {
@@ -91,6 +94,12 @@ void Optimizer::getParams()
   getParam(s.bias_strength, "bias_strength", 0.5f);
   getParam(s.bias_lookahead_dist, "bias_lookahead_dist", 0.6f);
   getParam(s.bias_gain, "bias_gain", 1.5f);
+  std::string ancillary_name;
+  getParam(ancillary_name, "ancillary_type", std::string("pursuit"));
+  getParam(s.brake_gain, "brake_gain", 1.5f);
+  getParam(s.brake_scan_dist, "brake_scan_dist", 0.3f);
+  s.ancillary_type = (ancillary_name == "braking") ?
+    models::AncillaryType::BRAKING : models::AncillaryType::PURSUIT;
   if (variant_name == "log") {
     s.variant = models::MPPIVariant::LOG;
   } else if (variant_name == "lowpass") {
@@ -101,7 +110,12 @@ void Optimizer::getParams()
     s.variant = models::MPPIVariant::VANILLA;
     variant_name = "vanilla";
   }
-  RCLCPP_INFO(logger_, "[SLIP] MPPI variant = '%s'", variant_name.c_str());
+  if (s.variant == models::MPPIVariant::BIASED) {
+    RCLCPP_INFO(
+      logger_, "[SLIP] MPPI variant = 'biased' (ancillary = '%s')", ancillary_name.c_str());
+  } else {
+    RCLCPP_INFO(logger_, "[SLIP] MPPI variant = '%s'", variant_name.c_str());
+  }
 
   getParam(motion_model_name, "motion_model", std::string("DiffDrive"));
 
@@ -412,14 +426,29 @@ void Optimizer::updateControlSequence()
 
 void Optimizer::computeAncillaryControl()
 {
-  // Biased-MPPI (SLIP) ancillary controller: a cheap pursuit-to-path
-  // P-controller. It steers a lookahead point on the reference path; its
+  // Biased-MPPI (SLIP): dispatch to the selected ancillary controller. Its
   // (constant over the horizon) command becomes the shifted sampling mean for
-  // the biased fraction of samples. Swap this function to try other ancillaries
-  // (straight-to-goal, LQR tracking, CBF/braking) -- everything else is unchanged.
-  const auto & s = settings_;
+  // the biased fraction of samples; everything downstream is unchanged. This is
+  // the experiment axis -- PURSUIT is geometric guidance (follow the plan),
+  // BRAKING is reactive safety (avoid obstacles from the costmap).
   ancillary_vx_ = 0.0f;
   ancillary_wz_ = 0.0f;
+  switch (settings_.ancillary_type) {
+    case models::AncillaryType::BRAKING:
+      computeBrakingAncillary();
+      break;
+    case models::AncillaryType::PURSUIT:
+    default:
+      computePursuitAncillary();
+      break;
+  }
+}
+
+void Optimizer::computePursuitAncillary()
+{
+  // Pursuit-to-path P-controller: steer toward a lookahead point on the
+  // reference path. Biases samples toward FOLLOWING THE PLAN.
+  const auto & s = settings_;
 
   const std::size_t path_size = path_.x.shape(0);
   if (path_size < 2) {
@@ -450,6 +479,56 @@ void Optimizer::computeAncillaryControl()
   ancillary_vx_ = std::clamp(
     s.constraints.vx_max * std::max(0.0f, std::cos(heading_err)),
     s.constraints.vx_min, s.constraints.vx_max);
+}
+
+void Optimizer::computeBrakingAncillary()
+{
+  // CBF/braking reactive controller (minimal CBF: a 1-D barrier on the costmap
+  // proximity proxy). Biases samples toward SAFE MOTION:
+  //   - forward speed scales with the safety margin  h = INSCRIBED - cost
+  //     (full speed in open space, ~zero at an obstacle boundary),
+  //   - yaw steers DOWN the cost gradient (away from the nearest obstacle).
+  // Reads only the costmap + robot pose -- the same "world model" the critics
+  // already use. Naturally commands stop near obstacles/goal (no pursuit swirl).
+  const auto & s = settings_;
+  if (costmap_ == nullptr) {
+    return;  // no costmap -> no bias
+  }
+
+  const float rx = static_cast<float>(state_.pose.pose.position.x);
+  const float ry = static_cast<float>(state_.pose.pose.position.y);
+  const float ryaw = tf2::getYaw(state_.pose.pose.orientation);
+
+  // Sample the costmap at a world point; unknown/off-map treated as free (0).
+  auto cost_at = [this](float wx, float wy) -> float {
+      unsigned int mx, my;
+      if (!costmap_->worldToMap(wx, wy, mx, my)) {
+        return 0.0f;  // off-map -> treat as open
+      }
+      const unsigned char c = costmap_->getCost(mx, my);
+      if (c == nav2_costmap_2d::NO_INFORMATION) {
+        return 0.0f;  // unknown -> keep moving rather than freeze
+      }
+      return static_cast<float>(c);
+    };
+
+  // Safety margin at the robot: 1 in open space, 0 at the inscribed boundary.
+  const float kInscribed =
+    static_cast<float>(nav2_costmap_2d::INSCRIBED_INFLATED_OBSTACLE);
+  const float safe = std::clamp((kInscribed - cost_at(rx, ry)) / kInscribed, 0.0f, 1.0f);
+  ancillary_vx_ = std::clamp(safe * s.constraints.vx_max, 0.0f, s.constraints.vx_max);
+
+  // Cost gradient via central differences; points TOWARD higher cost (obstacle).
+  const float d = std::max(s.brake_scan_dist, static_cast<float>(costmap_->getResolution()));
+  const float gx = cost_at(rx + d, ry) - cost_at(rx - d, ry);
+  const float gy = cost_at(rx, ry + d) - cost_at(rx, ry - d);
+
+  // Steer down-gradient (away from the obstacle); flat gradient -> go straight.
+  if (gx * gx + gy * gy > 1e-6f) {
+    const float heading_err = static_cast<float>(
+      angles::shortest_angular_distance(ryaw, std::atan2(-gy, -gx)));
+    ancillary_wz_ = std::clamp(s.brake_gain * heading_err, -s.constraints.wz, s.constraints.wz);
+  }
 }
 
 void Optimizer::applyBiasedControls()

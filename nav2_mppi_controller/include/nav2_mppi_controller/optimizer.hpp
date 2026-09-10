@@ -210,10 +210,22 @@ protected:
   void updateControlSequence();
 
   /**
-   * @brief Biased-MPPI (SLIP): compute the ancillary controller command
-   * (pursuit-to-path P-controller) used as the shifted sampling mean.
+   * @brief Biased-MPPI (SLIP): compute the ancillary controller command used as
+   * the shifted sampling mean, dispatching on the "ancillary_type" parameter.
    */
   void computeAncillaryControl();
+
+  /**
+   * @brief Biased-MPPI (SLIP) ancillary: pursuit-to-path P-controller
+   * (biases samples toward following the plan).
+   */
+  void computePursuitAncillary();
+
+  /**
+   * @brief Biased-MPPI (SLIP) ancillary: CBF/braking reactive controller
+   * (biases samples toward safe motion using the costmap).
+   */
+  void computeBrakingAncillary();
 
   /**
    * @brief Biased-MPPI (SLIP): re-center a fraction of the samples onto the

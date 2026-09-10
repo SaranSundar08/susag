@@ -6,6 +6,9 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/laser_scan.hpp>
+#include <message_filters/subscriber.h>
+#include <message_filters/synchronizer.h>
+#include <message_filters/sync_policies/approximate_time.h>
 
 #include <pcl_conversions/pcl_conversions.h>
 #include <sensor_msgs/msg/point_cloud2.hpp>
@@ -22,37 +25,40 @@
 class scanMerger : public rclcpp::Node
 {
 public:
+  using LaserScan = sensor_msgs::msg::LaserScan;
+  using SyncPolicy =
+    message_filters::sync_policies::ApproximateTime<LaserScan, LaserScan>;
+
   scanMerger() : Node("ros2_laser_scan_merger")
   {
     initialize_params();
     refresh_params();
 
-    laser1_ = std::make_shared<sensor_msgs::msg::LaserScan>();
-    laser2_ = std::make_shared<sensor_msgs::msg::LaserScan>();
-
-    auto default_qos = rclcpp::QoS(rclcpp::SensorDataQoS());
-    sub1_ = this->create_subscription<sensor_msgs::msg::LaserScan>(
-        topic1_, default_qos, std::bind(&scanMerger::scan_callback1, this, std::placeholders::_1));
-    sub2_ = this->create_subscription<sensor_msgs::msg::LaserScan>(
-        topic2_, default_qos, std::bind(&scanMerger::scan_callback2, this, std::placeholders::_1));
+    sub1_.subscribe(this, topic1_, rmw_qos_profile_sensor_data);
+    sub2_.subscribe(this, topic2_, rmw_qos_profile_sensor_data);
+    synchronizer_ = std::make_shared<message_filters::Synchronizer<SyncPolicy>>(
+      SyncPolicy(20), sub1_, sub2_);
+    synchronizer_->setMaxIntervalDuration(rclcpp::Duration(0, 10000000));
+    synchronizer_->registerCallback(
+      std::bind(
+        &scanMerger::synchronized_callback, this,
+        std::placeholders::_1, std::placeholders::_2));
 
     point_cloud_pub_ = this->create_publisher<sensor_msgs::msg::PointCloud2>(cloudTopic_, rclcpp::SensorDataQoS());
-    RCLCPP_INFO(this->get_logger(), "Hello");
+    RCLCPP_INFO(
+      this->get_logger(),
+      "Synchronizing %s and %s (ApproximateTime, max skew 10 ms)",
+      topic1_.c_str(), topic2_.c_str());
   }
 
 private:
-  void scan_callback1(const sensor_msgs::msg::LaserScan::SharedPtr _msg)
+  void synchronized_callback(
+    const LaserScan::ConstSharedPtr & front,
+    const LaserScan::ConstSharedPtr & rear)
   {
-    laser1_ = _msg;
+    laser1_ = front;
+    laser2_ = rear;
     update_point_cloud_rgb();
-    // RCLCPP_INFO(this->get_logger(), "I heard: '%f' '%f'", _msg->ranges[0],
-    //         _msg->ranges[100]);
-  }
-  void scan_callback2(const sensor_msgs::msg::LaserScan::SharedPtr _msg)
-  {
-    laser2_ = _msg;
-    // RCLCPP_INFO(this->get_logger(), "I heard: '%f' '%f'", _msg->ranges[0],
-    //         _msg->ranges[100]);
   }
 
   void update_point_cloud_rgb()
@@ -228,15 +234,11 @@ private:
     auto pc2_msg_ = std::make_shared<sensor_msgs::msg::PointCloud2>();
     pcl::toROSMsg(cloud_, *pc2_msg_);
     pc2_msg_->header.frame_id = cloudFrameId_;
-    pc2_msg_->header.stamp = now();
-    if (show1_ && laser1_)
-    {
-      pc2_msg_->header.stamp = laser1_->header.stamp;  
-    }
-    if (show2_ && laser2_)
-    {
-      pc2_msg_->header.stamp = laser2_->header.stamp;  
-    }
+    // The pair is guaranteed to be within 10 ms. Use the newer measurement
+    // time rather than unconditionally stamping the cloud with the rear scan.
+    pc2_msg_->header.stamp =
+      rclcpp::Time(laser1_->header.stamp) >= rclcpp::Time(laser2_->header.stamp) ?
+      laser1_->header.stamp : laser2_->header.stamp;
     pc2_msg_->is_dense = false;
     point_cloud_pub_->publish(*pc2_msg_);
   }
@@ -357,12 +359,13 @@ private:
   float laser2XOff_, laser2YOff_, laser2ZOff_, laser2Alpha_, laser2AngleMin_, laser2AngleMax_;
   uint8_t laser2R_, laser2G_, laser2B_;
 
-  rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr sub1_;
-  rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr sub2_;
+  message_filters::Subscriber<LaserScan> sub1_;
+  message_filters::Subscriber<LaserScan> sub2_;
+  std::shared_ptr<message_filters::Synchronizer<SyncPolicy>> synchronizer_;
   rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr point_cloud_pub_;
 
-  sensor_msgs::msg::LaserScan::SharedPtr laser1_;
-  sensor_msgs::msg::LaserScan::SharedPtr laser2_;
+  LaserScan::ConstSharedPtr laser1_;
+  LaserScan::ConstSharedPtr laser2_;
 };
 
 int main(int argc, char* argv[])

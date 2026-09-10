@@ -100,6 +100,31 @@
   </plugin>
 </gazebo>
 
+<!-- Ground-truth pose, independent of the diff_drive plugin's own ideal
+     kinematics odometry: diagnostic only, published from Gazebo's actual
+     simulated rigid-body pose in the world (global/inertial) frame, so it
+     is unaffected by whatever the drive plugin assumes about wheel slip.
+     Compare against /odom during a turn-in-place: if they track together,
+     any observed drift is a TF/clock issue (see PROJECT_STATUS.md,
+     2026-09-10 entry); if they diverge specifically during rotation,
+     Gazebo is genuinely simulating skid-steer slip on this 4-wheel,
+     no-steering-DOF chassis, the same effect robot_model.py's
+     yaw_gain/speed_yaw_loss already models for the real robot. Zero
+     noise deliberately: this is ground truth, not a simulated sensor. -->
+<gazebo>
+  <plugin name="ground_truth_p3d" filename="libgazebo_ros_p3d.so">
+    <ros>
+      <remapping>odom:=ground_truth/odom</remapping>
+    </ros>
+    <body_name>base_link</body_name>
+    <frame_name>world</frame_name>
+    <update_rate>30.0</update_rate>
+    <xyz_offset>0 0 0</xyz_offset>
+    <rpy_offset>0 0 0</rpy_offset>
+    <gaussian_noise>0.0</gaussian_noise>
+  </plugin>
+</gazebo>
+
 
 <!-- front lidar -->
 <gazebo reference="front_lidar_1">
@@ -133,8 +158,12 @@
     <plugin name="gazebo_ros_lidar_front" filename="libgazebo_ros_ray_sensor.so">
       <ros>
         <!-- <namespace>/susag</namespace> -->
-        <!-- publish to /front_scan so the merger (params.yaml scanTopic1) can fuse
-             it with /rear_scan; the merged 360 deg scan is republished on /scan -->
+        <!-- /front_scan and /rear_scan are consumed as TWO separate costmap
+             observation sources, and AMCL localizes on /front_scan alone:
+             same topic names as the real robot's ydlidar dual_launch.py, so
+             one Nav2 yaml serves sim and hardware. No laser merger: it fed
+             AMCL a rear-only "360 deg" scan on the same /scan topic as this
+             raw front scan (see PROJECT_STATUS.md 2026-09-09). -->
         <remapping>~/out:=front_scan</remapping>
       </ros>
       <output_type>sensor_msgs/LaserScan</output_type>
@@ -219,10 +248,15 @@
     <plugin name="depth_camera_plugin" filename="libgazebo_ros_camera.so">
       <ros>
         <namespace>susag</namespace>
-        <remapping>~/image:=/image_raw</remapping>
-        <remapping>~/camera_info:=/camera_info</remapping>
-        <remapping>~/depth_image:=/depth/image_raw</remapping>
-        <remapping>~/points:=depth_camera/points</remapping>
+        <!-- No remaps. gazebo_ros_camera remap keys must be prefixed with
+             the camera_name (see gazebo_ros_depth_camera_demo.world); the
+             earlier "~/image", "~/points" keys matched nothing and were
+             silently ignored, so the topics have always been the defaults:
+               /susag/depth_camera/image_raw
+               /susag/depth_camera/depth/image_raw
+               /susag/depth_camera/camera_info  (+ depth/camera_info)
+               /susag/depth_camera/points
+             Nav2 yamls and susag_nav.rviz now use these names. -->
       </ros>
 
       <camera_name>depth_camera</camera_name>

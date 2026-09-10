@@ -72,8 +72,8 @@
     queue_size: 16
     range_max: 10.0
     range_min: 0.35
-    scan_time: 0.3333
+    scan_time: 0.0333       # simulated front/rear lidars publish at 30 Hz
     target_frame: base_link
-    transform_tolerance: 0.01
+    transform_tolerance: 0.05
     use_inf: true
     use_sim_time: true

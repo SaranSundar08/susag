@@ -1,0 +1,134 @@
+[INFO] [launch]: All log files can be found below /home/saran/.ros/log/2026-07-15-16-05-03-499340-aorus-143671
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [robot_state_publisher-1]: process started with pid [143692]
+[INFO] [joint_state_publisher-2]: process started with pid [143694]
+[INFO] [gzserver-3]: process started with pid [143696]
+[INFO] [spawn_entity.py-4]: process started with pid [143698]
+[INFO] [ros2_laser_scan_merger-5]: process started with pid [143700]
+[INFO] [pointcloud_to_laserscan_node-6]: process started with pid [143702]
+[ros2_laser_scan_merger-5] [INFO] [1784124304.471600153] [ros2_laser_scan_merger]: Hello
+[pointcloud_to_laserscan_node-6] [INFO] [1784124304.472481907] [pointcloud_to_laserscan]: Got a subscriber to laserscan, starting pointcloud subscriber
+[robot_state_publisher-1] Warning: link 'laser_center_link' material 'yellow' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] Warning: link 'laser_center_link' material 'yellow' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] [WARN] [1784124304.504974088] [kdl_parser]: The root link base_link has an inertia specified in the URDF, but KDL does not support a root link with an inertia.  As a workaround, you can add an extra dummy link to your URDF.
+[robot_state_publisher-1] [INFO] [1784124304.505088543] [robot_state_publisher]: got segment base_link
+[robot_state_publisher-1] [INFO] [1784124304.505161042] [robot_state_publisher]: got segment front_left_wheel_1
+[robot_state_publisher-1] [INFO] [1784124304.505173405] [robot_state_publisher]: got segment front_lidar_1
+[robot_state_publisher-1] [INFO] [1784124304.505182271] [robot_state_publisher]: got segment front_right_wheel_1
+[robot_state_publisher-1] [INFO] [1784124304.505190620] [robot_state_publisher]: got segment imu_link
+[robot_state_publisher-1] [INFO] [1784124304.505198973] [robot_state_publisher]: got segment laser_center_link
+[robot_state_publisher-1] [INFO] [1784124304.505207552] [robot_state_publisher]: got segment real_sense_1
+[robot_state_publisher-1] [INFO] [1784124304.505215578] [robot_state_publisher]: got segment rear_left_wheel_1
+[robot_state_publisher-1] [INFO] [1784124304.505223429] [robot_state_publisher]: got segment rear_lidar_1
+[robot_state_publisher-1] [INFO] [1784124304.505231545] [robot_state_publisher]: got segment rear_right_wheel_1
+[ERROR] [gzserver-3]: process has died [pid 143696, exit code 255, cmd 'gzserver /home/saran/robohouse_ws/src/BARN_dataset/world_files/world_61.world -slibgazebo_ros_init.so -slibgazebo_ros_factory.so -slibgazebo_ros_force_system.so'].
+[joint_state_publisher-2] [INFO] [1784124304.775175237] [joint_state_publisher]: Waiting for robot_description to be published on the robot_description topic...
+[spawn_entity.py-4] [INFO] [1784124304.803070749] [spawn_entity]: Spawn Entity started
+[spawn_entity.py-4] [INFO] [1784124304.803551764] [spawn_entity]: Loading entity published on topic robot_description
+[spawn_entity.py-4] [INFO] [1784124304.805084508] [spawn_entity]: Waiting for entity xml on robot_description
+[spawn_entity.py-4] [INFO] [1784124304.816300783] [spawn_entity]: Waiting for service /spawn_entity, timeout = 30
+[spawn_entity.py-4] [INFO] [1784124304.816618472] [spawn_entity]: Waiting for service /spawn_entity
+[spawn_entity.py-4] [INFO] [1784124304.819321924] [spawn_entity]: Calling service /spawn_entity
+[pointcloud_to_laserscan_node-6] [WARN] [1784124323.623815816] [pointcloud_to_laserscan]: New subscription discovered on topic '/scan', requesting incompatible QoS. No messages will be sent to it. Last incompatible policy: RELIABILITY_QOS_POLICY
+[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
+[INFO] [pointcloud_to_laserscan_node-6]: sending signal 'SIGINT' to process[pointcloud_to_laserscan_node-6]
+[INFO] [ros2_laser_scan_merger-5]: sending signal 'SIGINT' to process[ros2_laser_scan_merger-5]
+[INFO] [spawn_entity.py-4]: sending signal 'SIGINT' to process[spawn_entity.py-4]
+[INFO] [joint_state_publisher-2]: sending signal 'SIGINT' to process[joint_state_publisher-2]
+[INFO] [robot_state_publisher-1]: sending signal 'SIGINT' to process[robot_state_publisher-1]
+[ros2_laser_scan_merger-5] [INFO] [1784124327.151914095] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[pointcloud_to_laserscan_node-6] [INFO] [1784124327.151924264] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[robot_state_publisher-1] [INFO] [1784124327.151925327] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[spawn_entity.py-4] Traceback (most recent call last):
+[spawn_entity.py-4]   File "/opt/ros/humble/lib/gazebo_ros/spawn_entity.py", line 372, in <module>
+[spawn_entity.py-4]     main()
+[spawn_entity.py-4]   File "/opt/ros/humble/lib/gazebo_ros/spawn_entity.py", line 367, in main
+[spawn_entity.py-4]     exit_code = spawn_entity_node.run()
+[spawn_entity.py-4]   File "/opt/ros/humble/lib/gazebo_ros/spawn_entity.py", line 228, in run
+[spawn_entity.py-4]     success = self._spawn_entity(entity_xml, initial_pose, spawn_service_timeout)
+[spawn_entity.py-4]   File "/opt/ros/humble/lib/gazebo_ros/spawn_entity.py", line 290, in _spawn_entity
+[spawn_entity.py-4]     rclpy.spin_once(self)
+[spawn_entity.py-4]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/__init__.py", line 208, in spin_once
+[spawn_entity.py-4]     executor.spin_once(timeout_sec=timeout_sec)
+[spawn_entity.py-4]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 808, in spin_once
+[spawn_entity.py-4]     self._spin_once_impl(timeout_sec)
+[spawn_entity.py-4]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 797, in _spin_once_impl
+[spawn_entity.py-4]     handler, entity, node = self.wait_for_ready_callbacks(timeout_sec=timeout_sec)
+[spawn_entity.py-4]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 780, in wait_for_ready_callbacks
+[spawn_entity.py-4]     return next(self._cb_iter)
+[spawn_entity.py-4]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 677, in _wait_for_ready_callbacks
+[spawn_entity.py-4]     wait_set.wait(timeout_nsec)
+[spawn_entity.py-4] KeyboardInterrupt
+[pointcloud_to_laserscan_node-6] [INFO] [1784124327.156889312] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[ros2_laser_scan_merger-5] [INFO] [1784124327.157636470] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[joint_state_publisher-2] Traceback (most recent call last):
+[joint_state_publisher-2]   File "/opt/ros/humble/lib/joint_state_publisher/joint_state_publisher", line 33, in <module>
+[joint_state_publisher-2]     sys.exit(load_entry_point('joint-state-publisher==2.4.0', 'console_scripts', 'joint_state_publisher')())
+[joint_state_publisher-2]   File "/opt/ros/humble/lib/python3.10/site-packages/joint_state_publisher/joint_state_publisher.py", line 470, in main
+[joint_state_publisher-2]     jsp.destroy_node()
+[joint_state_publisher-2]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/node.py", line 1696, in destroy_node
+[joint_state_publisher-2]     self.__node.destroy_when_not_in_use()
+[joint_state_publisher-2] KeyboardInterrupt
+[ERROR] [robot_state_publisher-1]: process has died [pid 143692, exit code -2, cmd '/opt/ros/humble/lib/robot_state_publisher/robot_state_publisher --ros-args -r __node:=robot_state_publisher --params-file /tmp/launch_params_v4gb6y75'].
+[ERROR] [spawn_entity.py-4]: process has died [pid 143698, exit code -2, cmd '/opt/ros/humble/lib/gazebo_ros/spawn_entity.py -entity susag_updated_model -topic robot_description -x -2.25 -y 1.0 -z 0.1 -Y 1.5708 --ros-args'].
+[ERROR] [joint_state_publisher-2]: process has died [pid 143694, exit code -2, cmd '/opt/ros/humble/lib/joint_state_publisher/joint_state_publisher --ros-args -r __node:=joint_state_publisher --params-file /tmp/launch_params_3tof49mo'].
+[INFO] [pointcloud_to_laserscan_node-6]: process has finished cleanly [pid 143702]
+[INFO] [ros2_laser_scan_merger-5]: process has finished cleanly [pid 143700]
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                [pointcloud_to_laserscan_node-6] [INFO] [1784124303.358450676] [pointcloud_to_laserscan]: Got a subscriber to laserscan, starting pointcloud subscriber
+[pointcloud_to_laserscan_node-6] [WARN] [1784124323.623766294] [pointcloud_to_laserscan]: New subscription discovered on topic '/scan', requesting incompatible QoS. No messages will be sent to it. Last incompatible policy: RELIABILITY_QOS_POLICY
+[gzserver-3] [INFO] [1784124338.965043577] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[ERROR] [gzserver-3]: process has died [pid 122901, exit code -9, cmd 'gzserver /home/saran/robohouse_ws/src/BARN_dataset/world_files/world_61.world -slibgazebo_ros_init.so -slibgazebo_ros_factory.so -slibgazebo_ros_force_system.so'].
+[pointcloud_to_laserscan_node-6] [INFO] [1784124399.598902812] [pointcloud_to_laserscan]: No subscribers to laserscan, shutting down pointcloud subscriber
+[pointcloud_to_laserscan_node-6] [INFO] [1784124471.618080993] [pointcloud_to_laserscan]: Got a subscriber to laserscan, starting pointcloud subscriber
+[pointcloud_to_laserscan_node-6] [WARN] [1784124473.219592903] [pointcloud_to_laserscan]: New subscription discovered on topic '/scan', requesting incompatible QoS. No messages will be sent to it. Last incompatible policy: RELIABILITY_QOS_POLICY
+[pointcloud_to_laserscan_node-6] [WARN] [1784124474.215136912] [tf2_buffer]: Detected jump back in time. Clearing TF buffer.
+[pointcloud_to_laserscan_node-6] [INFO] [1784124518.507884837] [pointcloud_to_laserscan]: No subscribers to laserscan, shutting down pointcloud subscriber
+[pointcloud_to_laserscan_node-6] [WARN] [1784125485.464420205] [tf2_buffer]: Detected jump back in time. Clearing TF buffer.
+[pointcloud_to_laserscan_node-6] [INFO] [1784125614.595516296] [pointcloud_to_laserscan]: Got a subscriber to laserscan, starting pointcloud subscriber
+[pointcloud_to_laserscan_node-6] [WARN] [1784125615.047867631] [pointcloud_to_laserscan]: New subscription discovered on topic '/scan', requesting incompatible QoS. No messages will be sent to it. Last incompatible policy: RELIABILITY_QOS_POLICY
+[pointcloud_to_laserscan_node-6] [INFO] [1784125901.803823329] [pointcloud_to_laserscan]: No subscribers to laserscan, shutting down pointcloud subscriber
+[pointcloud_to_laserscan_node-6] [WARN] [1784126030.004694385] [tf2_buffer]: Detected jump back in time. Clearing TF buffer.
+[pointcloud_to_laserscan_node-6] [INFO] [1784126056.251266513] [pointcloud_to_laserscan]: Got a subscriber to laserscan, starting pointcloud subscriber
+[pointcloud_to_laserscan_node-6] [WARN] [1784126056.719348810] [pointcloud_to_laserscan]: New subscription discovered on topic '/scan', requesting incompatible QoS. No messages will be sent to it. Last incompatible policy: RELIABILITY_QOS_POLICY
+[pointcloud_to_laserscan_node-6] [INFO] [1784126126.059621740] [pointcloud_to_laserscan]: No subscribers to laserscan, shutting down pointcloud subscriber
+[pointcloud_to_laserscan_node-6] [INFO] [1784126126.561143799] [pointcloud_to_laserscan]: Got a subscriber to laserscan, starting pointcloud subscriber
+[pointcloud_to_laserscan_node-6] [WARN] [1784126126.676304025] [pointcloud_to_laserscan]: New subscription discovered on topic '/scan', requesting incompatible QoS. No messages will be sent to it. Last incompatible policy: RELIABILITY_QOS_POLICY
+[pointcloud_to_laserscan_node-6] [INFO] [1784126229.692937394] [pointcloud_to_laserscan]: No subscribers to laserscan, shutting down pointcloud subscriber
+[pointcloud_to_laserscan_node-6] [WARN] [1784126980.732138813] [tf2_buffer]: Detected jump back in time. Clearing TF buffer.
+[pointcloud_to_laserscan_node-6] [INFO] [1784126998.153595897] [pointcloud_to_laserscan]: Got a subscriber to laserscan, starting pointcloud subscriber
+[pointcloud_to_laserscan_node-6] [WARN] [1784126998.280239554] [pointcloud_to_laserscan]: New subscription discovered on topic '/scan', requesting incompatible QoS. No messages will be sent to it. Last incompatible policy: RELIABILITY_QOS_POLICY
+[pointcloud_to_laserscan_node-6] [INFO] [1784127117.527409702] [pointcloud_to_laserscan]: No subscribers to laserscan, shutting down pointcloud subscriber
+[pointcloud_to_laserscan_node-6] [WARN] [1784127512.885873407] [tf2_buffer]: Detected jump back in time. Clearing TF buffer.
+[pointcloud_to_laserscan_node-6] [INFO] [1784127516.645286952] [pointcloud_to_laserscan]: Got a subscriber to laserscan, starting pointcloud subscriber
+[pointcloud_to_laserscan_node-6] [WARN] [1784127516.764525186] [pointcloud_to_laserscan]: New subscription discovered on topic '/scan', requesting incompatible QoS. No messages will be sent to it. Last incompatible policy: RELIABILITY_QOS_POLICY
+[pointcloud_to_laserscan_node-6] [INFO] [1784127615.404914677] [pointcloud_to_laserscan]: No subscribers to laserscan, shutting down pointcloud subscriber
+[pointcloud_to_laserscan_node-6] [WARN] [1784127616.753806793] [tf2_buffer]: Detected jump back in time. Clearing TF buffer.
+[pointcloud_to_laserscan_node-6] [INFO] [1784127622.538449808] [pointcloud_to_laserscan]: Got a subscriber to laserscan, starting pointcloud subscriber
+[pointcloud_to_laserscan_node-6] [WARN] [1784127622.657798499] [pointcloud_to_laserscan]: New subscription discovered on topic '/scan', requesting incompatible QoS. No messages will be sent to it. Last incompatible policy: RELIABILITY_QOS_POLICY
+[pointcloud_to_laserscan_node-6] [INFO] [1784127721.416636886] [pointcloud_to_laserscan]: No subscribers to laserscan, shutting down pointcloud subscriber
+[pointcloud_to_laserscan_node-6] [WARN] [1784127775.645764860] [tf2_buffer]: Detected jump back in time. Clearing TF buffer.
+[pointcloud_to_laserscan_node-6] [INFO] [1784127777.914185301] [pointcloud_to_laserscan]: Got a subscriber to laserscan, starting pointcloud subscriber
+[pointcloud_to_laserscan_node-6] [WARN] [1784127778.009027512] [pointcloud_to_laserscan]: New subscription discovered on topic '/scan', requesting incompatible QoS. No messages will be sent to it. Last incompatible policy: RELIABILITY_QOS_POLICY
+[pointcloud_to_laserscan_node-6] [INFO] [1784127898.021667223] [pointcloud_to_laserscan]: No subscribers to laserscan, shutting down pointcloud subscriber
+[pointcloud_to_laserscan_node-6] [WARN] [1784128311.488477161] [tf2_buffer]: Detected jump back in time. Clearing TF buffer.
+[pointcloud_to_laserscan_node-6] [INFO] [1784128353.253108601] [pointcloud_to_laserscan]: Got a subscriber to laserscan, starting pointcloud subscriber
+[pointcloud_to_laserscan_node-6] [WARN] [1784128353.420421344] [pointcloud_to_laserscan]: New subscription discovered on topic '/scan', requesting incompatible QoS. No messages will be sent to it. Last incompatible policy: RELIABILITY_QOS_POLICY
+[pointcloud_to_laserscan_node-6] [INFO] [1784128494.285813288] [pointcloud_to_laserscan]: No subscribers to laserscan, shutting down pointcloud subscriber
+[pointcloud_to_laserscan_node-6] [WARN] [1784128525.451218473] [tf2_buffer]: Detected jump back in time. Clearing TF buffer.
+[pointcloud_to_laserscan_node-6] [INFO] [1784128534.296275129] [pointcloud_to_laserscan]: Got a subscriber to laserscan, starting pointcloud subscriber
+[pointcloud_to_laserscan_node-6] [WARN] [1784128534.416835561] [pointcloud_to_laserscan]: New subscription discovered on topic '/scan', requesting incompatible QoS. No messages will be sent to it. Last incompatible policy: RELIABILITY_QOS_POLICY
+[pointcloud_to_laserscan_node-6] [INFO] [1784129212.231438699] [pointcloud_to_laserscan]: No subscribers to laserscan, shutting down pointcloud subscriber
+[pointcloud_to_laserscan_node-6] [WARN] [1784129229.026121410] [tf2_buffer]: Detected jump back in time. Clearing TF buffer.
+[pointcloud_to_laserscan_node-6] [INFO] [1784129240.073131950] [pointcloud_to_laserscan]: Got a subscriber to laserscan, starting pointcloud subscriber
+[pointcloud_to_laserscan_node-6] [WARN] [1784129240.162171654] [pointcloud_to_laserscan]: New subscription discovered on topic '/scan', requesting incompatible QoS. No messages will be sent to it. Last incompatible policy: RELIABILITY_QOS_POLICY
+[pointcloud_to_laserscan_node-6] [INFO] [1784129597.459543532] [pointcloud_to_laserscan]: No subscribers to laserscan, shutting down pointcloud subscriber
+[pointcloud_to_laserscan_node-6] [WARN] [1784129617.385600873] [tf2_buffer]: Detected jump back in time. Clearing TF buffer.
+[pointcloud_to_laserscan_node-6] [INFO] [1784129621.906783411] [pointcloud_to_laserscan]: Got a subscriber to laserscan, starting pointcloud subscriber
+[pointcloud_to_laserscan_node-6] [WARN] [1784129622.053836492] [pointcloud_to_laserscan]: New subscription discovered on topic '/scan', requesting incompatible QoS. No messages will be sent to it. Last incompatible policy: RELIABILITY_QOS_POLICY
+[pointcloud_to_laserscan_node-6] [INFO] [1784129719.575195623] [pointcloud_to_laserscan]: No subscribers to laserscan, shutting down pointcloud subscriber
+[pointcloud_to_laserscan_node-6] [WARN] [1784129738.577820157] [tf2_buffer]: Detected jump back in time. Clearing TF buffer.
+[pointcloud_to_laserscan_node-6] [INFO] [1784129746.530634349] [pointcloud_to_laserscan]: Got a subscriber to laserscan, starting pointcloud subscriber
+[pointcloud_to_laserscan_node-6] [WARN] [1784129746.632500702] [pointcloud_to_laserscan]: New subscription discovered on topic '/scan', requesting incompatible QoS. No messages will be sent to it. Last incompatible policy: RELIABILITY_QOS_POLICY
+[pointcloud_to_laserscan_node-6] [INFO] [1784129766.333065350] [pointcloud_to_laserscan]: No subscribers to laserscan, shutting down pointcloud subscriber

@@ -35,6 +35,18 @@ enum class MPPIVariant
 };
 
 /**
+ * @enum mppi::models::AncillaryType
+ * @brief Which ancillary controller Biased-MPPI shifts samples toward (SLIP study).
+ *        Selected at runtime via the "ancillary_type" parameter. Experiment axis:
+ *        PURSUIT is guidance (follow the path), BRAKING is safety (avoid obstacles).
+ */
+enum class AncillaryType
+{
+  PURSUIT,   // pursuit-to-path P-controller: biases samples toward following the plan
+  BRAKING    // CBF/braking reactive controller: biases samples toward safe motion
+};
+
+/**
  * @struct mppi::models::OptimizerSettings
  * @brief Settings for the optimizer to use
  */
@@ -60,6 +72,9 @@ struct OptimizerSettings
   float bias_strength{0.5f};          // Biased-MPPI: fraction of samples shifted to ancillary
   float bias_lookahead_dist{0.6f};    // Biased-MPPI: pursuit lookahead distance (m)
   float bias_gain{1.5f};              // Biased-MPPI: pursuit heading P-gain
+  AncillaryType ancillary_type{AncillaryType::PURSUIT};  // which ancillary to bias toward
+  float brake_gain{1.5f};             // CBF/braking: obstacle-repulsion steering P-gain
+  float brake_scan_dist{0.3f};        // CBF/braking: cost-gradient finite-difference offset (m)
 };
 
 }  // namespace mppi::models

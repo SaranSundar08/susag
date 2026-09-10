@@ -1,0 +1,78 @@
+[INFO] [launch]: All log files can be found below /home/saran/.ros/log/2026-07-15-16-03-56-851309-aorus-141299
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [robot_state_publisher-1]: process started with pid [141340]
+[INFO] [joint_state_publisher-2]: process started with pid [141342]
+[INFO] [gzserver-3]: process started with pid [141346]
+[INFO] [spawn_entity.py-4]: process started with pid [141355]
+[INFO] [ros2_laser_scan_merger-5]: process started with pid [141357]
+[INFO] [pointcloud_to_laserscan_node-6]: process started with pid [141359]
+[ros2_laser_scan_merger-5] [INFO] [1784124237.837484316] [ros2_laser_scan_merger]: Hello
+[pointcloud_to_laserscan_node-6] [INFO] [1784124237.842008843] [pointcloud_to_laserscan]: Got a subscriber to laserscan, starting pointcloud subscriber
+[robot_state_publisher-1] Warning: link 'laser_center_link' material 'yellow' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] Warning: link 'laser_center_link' material 'yellow' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] [WARN] [1784124237.847416709] [kdl_parser]: The root link base_link has an inertia specified in the URDF, but KDL does not support a root link with an inertia.  As a workaround, you can add an extra dummy link to your URDF.
+[robot_state_publisher-1] [INFO] [1784124237.847509270] [robot_state_publisher]: got segment base_link
+[robot_state_publisher-1] [INFO] [1784124237.847575408] [robot_state_publisher]: got segment front_left_wheel_1
+[robot_state_publisher-1] [INFO] [1784124237.847579145] [robot_state_publisher]: got segment front_lidar_1
+[robot_state_publisher-1] [INFO] [1784124237.847582019] [robot_state_publisher]: got segment front_right_wheel_1
+[robot_state_publisher-1] [INFO] [1784124237.847584868] [robot_state_publisher]: got segment imu_link
+[robot_state_publisher-1] [INFO] [1784124237.847587287] [robot_state_publisher]: got segment laser_center_link
+[robot_state_publisher-1] [INFO] [1784124237.847590092] [robot_state_publisher]: got segment real_sense_1
+[robot_state_publisher-1] [INFO] [1784124237.847592516] [robot_state_publisher]: got segment rear_left_wheel_1
+[robot_state_publisher-1] [INFO] [1784124237.847594866] [robot_state_publisher]: got segment rear_lidar_1
+[robot_state_publisher-1] [INFO] [1784124237.847597176] [robot_state_publisher]: got segment rear_right_wheel_1
+[joint_state_publisher-2] [INFO] [1784124238.087779491] [joint_state_publisher]: Waiting for robot_description to be published on the robot_description topic...
+[ERROR] [gzserver-3]: process has died [pid 141346, exit code 255, cmd 'gzserver /home/saran/robohouse_ws/src/BARN_dataset/world_files/world_93.world -slibgazebo_ros_init.so -slibgazebo_ros_factory.so -slibgazebo_ros_force_system.so'].
+[robot_state_publisher-1] [INFO] [1784124238.161517224] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[joint_state_publisher-2] Traceback (most recent call last):
+[joint_state_publisher-2]   File "/opt/ros/humble/lib/joint_state_publisher/joint_state_publisher", line 33, in <module>
+[joint_state_publisher-2]     sys.exit(load_entry_point('joint-state-publisher==2.4.0', 'console_scripts', 'joint_state_publisher')())
+[joint_state_publisher-2]   File "/opt/ros/humble/lib/python3.10/site-packages/joint_state_publisher/joint_state_publisher.py", line 466, in main
+[joint_state_publisher-2]     rclpy.spin(jsp)
+[joint_state_publisher-2]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/__init__.py", line 229, in spin
+[joint_state_publisher-2]     executor.spin_once()
+[joint_state_publisher-2]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 808, in spin_once
+[joint_state_publisher-2]     self._spin_once_impl(timeout_sec)
+[joint_state_publisher-2]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 797, in _spin_once_impl
+[joint_state_publisher-2]     handler, entity, node = self.wait_for_ready_callbacks(timeout_sec=timeout_sec)
+[joint_state_publisher-2]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 780, in wait_for_ready_callbacks
+[joint_state_publisher-2]     return next(self._cb_iter)
+[joint_state_publisher-2]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 681, in _wait_for_ready_callbacks
+[joint_state_publisher-2]     raise ExternalShutdownException()
+[joint_state_publisher-2] rclpy.executors.ExternalShutdownException
+[INFO] [robot_state_publisher-1]: process has finished cleanly [pid 141340]
+[ERROR] [joint_state_publisher-2]: process has died [pid 141342, exit code 1, cmd '/opt/ros/humble/lib/joint_state_publisher/joint_state_publisher --ros-args -r __node:=joint_state_publisher --params-file /tmp/launch_params_n7_3lcls'].
+[spawn_entity.py-4] [INFO] [1784124238.506807813] [spawn_entity]: Spawn Entity started
+[spawn_entity.py-4] [INFO] [1784124238.507038033] [spawn_entity]: Loading entity published on topic robot_description
+[spawn_entity.py-4] [INFO] [1784124238.508314635] [spawn_entity]: Waiting for entity xml on robot_description
+[spawn_entity.py-4] [INFO] [1784124241.965034311] [spawn_entity]: Waiting for service /spawn_entity, timeout = 30
+[spawn_entity.py-4] [INFO] [1784124241.965435302] [spawn_entity]: Waiting for service /spawn_entity
+[spawn_entity.py-4] [INFO] [1784124241.968963814] [spawn_entity]: Calling service /spawn_entity
+[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
+[pointcloud_to_laserscan_node-6] [INFO] [1784124252.829764058] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[ros2_laser_scan_merger-5] [INFO] [1784124252.829780717] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[spawn_entity.py-4] Traceback (most recent call last):
+[spawn_entity.py-4]   File "/opt/ros/humble/lib/gazebo_ros/spawn_entity.py", line 372, in <module>
+[spawn_entity.py-4]     main()
+[spawn_entity.py-4]   File "/opt/ros/humble/lib/gazebo_ros/spawn_entity.py", line 367, in main
+[spawn_entity.py-4]     exit_code = spawn_entity_node.run()
+[spawn_entity.py-4]   File "/opt/ros/humble/lib/gazebo_ros/spawn_entity.py", line 228, in run
+[spawn_entity.py-4]     success = self._spawn_entity(entity_xml, initial_pose, spawn_service_timeout)
+[spawn_entity.py-4]   File "/opt/ros/humble/lib/gazebo_ros/spawn_entity.py", line 290, in _spawn_entity
+[spawn_entity.py-4]     rclpy.spin_once(self)
+[spawn_entity.py-4]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/__init__.py", line 208, in spin_once
+[spawn_entity.py-4]     executor.spin_once(timeout_sec=timeout_sec)
+[spawn_entity.py-4]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 808, in spin_once
+[spawn_entity.py-4]     self._spin_once_impl(timeout_sec)
+[spawn_entity.py-4]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 797, in _spin_once_impl
+[spawn_entity.py-4]     handler, entity, node = self.wait_for_ready_callbacks(timeout_sec=timeout_sec)
+[spawn_entity.py-4]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 780, in wait_for_ready_callbacks
+[spawn_entity.py-4]     return next(self._cb_iter)
+[spawn_entity.py-4]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 677, in _wait_for_ready_callbacks
+[spawn_entity.py-4]     wait_set.wait(timeout_nsec)
+[spawn_entity.py-4] KeyboardInterrupt
+[ERROR] [spawn_entity.py-4]: process has died [pid 141355, exit code -2, cmd '/opt/ros/humble/lib/gazebo_ros/spawn_entity.py -entity susag_updated_model -topic robot_description -x -2.25 -y 1.0 -z 0.1 -Y 1.5708 --ros-args'].
+[INFO] [ros2_laser_scan_merger-5]: process has finished cleanly [pid 141357]
+[INFO] [pointcloud_to_laserscan_node-6]: process has finished cleanly [pid 141359]

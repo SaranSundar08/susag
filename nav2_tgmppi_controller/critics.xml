@@ -1,0 +1,53 @@
+<class_libraries>
+  <library path="tgmppi_critics">
+
+    <class type="tgmppi::critics::ObstaclesCritic" base_class_type="tgmppi::critics::CriticFunction">
+      <description>tgmppi critic for obstacle avoidance</description>
+    </class>
+
+    <class type="tgmppi::critics::CostCritic" base_class_type="tgmppi::critics::CriticFunction">
+      <description>tgmppi critic for obstacle avoidance using costmap score</description>
+    </class>
+
+    <class type="tgmppi::critics::GoalCritic" base_class_type="tgmppi::critics::CriticFunction">
+      <description>tgmppi critic for driving towards the goal</description>
+    </class>
+
+    <class type="tgmppi::critics::FlowFieldCritic" base_class_type="tgmppi::critics::CriticFunction">
+      <description>tgmppi critic scoring trajectories by the water level (geodesic distance-to-goal through robot-passable space); replaces Goal/PathAlign/PathFollow critics in flow mode</description>
+    </class>
+
+    <class type="tgmppi::critics::GoalAngleCritic" base_class_type="tgmppi::critics::CriticFunction">
+      <description>tgmppi critic for achieving the goal heading angle</description>
+    </class>
+
+    <class type="tgmppi::critics::PathAlignCritic" base_class_type="tgmppi::critics::CriticFunction">
+      <description>tgmppi critic for aligning to path</description>
+    </class>
+
+    <class type="tgmppi::critics::PathAngleCritic" base_class_type="tgmppi::critics::CriticFunction">
+      <description>tgmppi critic for tracking the path in the correct heading</description>
+    </class>
+
+    <class type="tgmppi::critics::PathFollowCritic" base_class_type="tgmppi::critics::CriticFunction">
+      <description>tgmppi critic for driving towards the goal that is furthest among trajectories nearest path points</description>
+    </class>
+
+    <class type="tgmppi::critics::PreferForwardCritic" base_class_type="tgmppi::critics::CriticFunction">
+      <description></description>
+    </class>
+
+    <class type="tgmppi::critics::TwirlingCritic" base_class_type="tgmppi::critics::CriticFunction">
+      <description>tgmppi critic for preventing twirling behavior when using omnidirectional models</description>
+    </class>
+
+    <class type="tgmppi::critics::ConstraintCritic" base_class_type="tgmppi::critics::CriticFunction">
+      <description>tgmppi critic for incentivizing moving within kinematic and dynamic bounds</description>
+    </class>
+
+    <class type="tgmppi::critics::VelocityDeadbandCritic" base_class_type="tgmppi::critics::CriticFunction">
+      <description>tgmppi critic for restricting command velocities in deadband range</description>
+    </class>
+
+  </library>
+</class_libraries>

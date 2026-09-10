@@ -141,7 +141,7 @@ Visualization Manager:
       Max Intensity: 0
       Min Color: 0; 0; 0
       Min Intensity: 0
-      Name: LaserScan
+      Name: LaserScan front
       Position Transformer: XYZ
       Selectable: true
       Size (Pixels): 3
@@ -152,9 +152,42 @@ Visualization Manager:
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Best Effort
-        Value: /scan
+        Value: /front_scan
       Use Fixed Frame: true
       Use rainbow: true
+      Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz_default_plugins/LaserScan
+      Color: 255; 85; 0
+      Color Transformer: FlatColor
+      Decay Time: 0
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 0
+      Min Color: 0; 0; 0
+      Min Intensity: 0
+      Name: LaserScan rear
+      Position Transformer: XYZ
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.10000000149011612
+      Style: Flat Squares
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Best Effort
+        Value: /rear_scan
+      Use Fixed Frame: true
+      Use rainbow: false
       Value: true
     - Alpha: 1
       Autocompute Intensity Bounds: true
@@ -395,8 +428,8 @@ Visualization Manager:
             Value: /local_plan
           Value: true
         - Class: rviz_default_plugins/MarkerArray
-          Enabled: false
-          Name: Trajectories
+          Enabled: true
+          Name: TG-MPPI sample cloud (/trajectories)
           Namespaces:
             {}
           Topic:
@@ -404,8 +437,8 @@ Visualization Manager:
             Durability Policy: Volatile
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /marker
-          Value: false
+            Value: /trajectories
+          Value: true
         - Alpha: 1
           Class: rviz_default_plugins/Polygon
           Color: 25; 255; 0
@@ -455,20 +488,246 @@ Visualization Manager:
       Name: Controller
     - Class: rviz_common/Group
       Displays:
-        - Class: rviz_default_plugins/Image
-          Enabled: true
-          Max Value: 1
-          Median window: 5
-          Min Value: 0
-          Name: RealsenseCamera
-          Normalize Range: true
+        - Class: rviz_default_plugins/MarkerArray
+          Enabled: false
+          Name: "Flood body / boundary / branches (/tgmppi_debug) -- HEAVY: ~31k spheres rebuilt in the control loop at 20 Hz while subscribed; enable for screenshots only"
+          Namespaces:
+            tgmppi_body: true
+            tgmppi_membrane: true
+            tgmppi_membrane_halo: true
+            tgmppi_pseudopods: true
+            flow_dirs: true
+            tgmppi_scan: true
+            tgmppi_mode: true
+            tgmppi_state: true
           Topic:
             Depth: 5
             Durability Policy: Volatile
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /intel_realsense_r200_depth/image_raw
+            Value: /tgmppi_debug
+          Value: false
+        - Alpha: 0.9
+          Buffer Length: 1
+          Class: rviz_default_plugins/Path
+          Color: 211; 54; 130
+          Enabled: true
+          Head Diameter: 0.05000000074505806
+          Head Length: 0.05000000074505806
+          Length: 0.30000001192092896
+          Line Style: Billboards
+          Line Width: 0.03999999910593033
+          Name: Branch P1 reference (ancillary_path_1)
+          Offset:
+            X: 0
+            Y: 0
+            Z: 0
+          Pose Color: 211; 54; 130
+          Pose Style: None
+          Radius: 0.029999999329447746
+          Shaft Diameter: 0.009999999776482582
+          Shaft Length: 0.10000000149011612
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /tgmppi/ancillary_path_1
           Value: true
+        - Alpha: 0.9
+          Buffer Length: 1
+          Class: rviz_default_plugins/Path
+          Color: 108; 159; 47
+          Enabled: true
+          Head Diameter: 0.05000000074505806
+          Head Length: 0.05000000074505806
+          Length: 0.30000001192092896
+          Line Style: Billboards
+          Line Width: 0.03999999910593033
+          Name: Branch P2 reference (ancillary_path_2)
+          Offset:
+            X: 0
+            Y: 0
+            Z: 0
+          Pose Color: 108; 159; 47
+          Pose Style: None
+          Radius: 0.029999999329447746
+          Shaft Diameter: 0.009999999776482582
+          Shaft Length: 0.10000000149011612
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /tgmppi/ancillary_path_2
+          Value: true
+        - Alpha: 0.9
+          Buffer Length: 1
+          Class: rviz_default_plugins/Path
+          Color: 140; 90; 199
+          Enabled: true
+          Head Diameter: 0.05000000074505806
+          Head Length: 0.05000000074505806
+          Length: 0.30000001192092896
+          Line Style: Billboards
+          Line Width: 0.03999999910593033
+          Name: Branch P3 reference (ancillary_path_3)
+          Offset:
+            X: 0
+            Y: 0
+            Z: 0
+          Pose Color: 140; 90; 199
+          Pose Style: None
+          Radius: 0.029999999329447746
+          Shaft Diameter: 0.009999999776482582
+          Shaft Length: 0.10000000149011612
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /tgmppi/ancillary_path_3
+          Value: true
+        - Alpha: 1
+          Buffer Length: 1
+          Class: rviz_default_plugins/Path
+          Color: 211; 54; 130
+          Enabled: true
+          Head Diameter: 0.05000000074505806
+          Head Length: 0.05000000074505806
+          Length: 0.30000001192092896
+          Line Style: Billboards
+          Line Width: 0.07000000029802322
+          Name: Branch P1 validated rollout (ancillary_rollout_1)
+          Offset:
+            X: 0
+            Y: 0
+            Z: 0.01
+          Pose Color: 211; 54; 130
+          Pose Style: None
+          Radius: 0.029999999329447746
+          Shaft Diameter: 0.009999999776482582
+          Shaft Length: 0.10000000149011612
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /tgmppi/ancillary_rollout_1
+          Value: true
+        - Alpha: 1
+          Buffer Length: 1
+          Class: rviz_default_plugins/Path
+          Color: 108; 159; 47
+          Enabled: true
+          Head Diameter: 0.05000000074505806
+          Head Length: 0.05000000074505806
+          Length: 0.30000001192092896
+          Line Style: Billboards
+          Line Width: 0.07000000029802322
+          Name: Branch P2 validated rollout (ancillary_rollout_2)
+          Offset:
+            X: 0
+            Y: 0
+            Z: 0.01
+          Pose Color: 108; 159; 47
+          Pose Style: None
+          Radius: 0.029999999329447746
+          Shaft Diameter: 0.009999999776482582
+          Shaft Length: 0.10000000149011612
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /tgmppi/ancillary_rollout_2
+          Value: true
+        - Alpha: 1
+          Buffer Length: 1
+          Class: rviz_default_plugins/Path
+          Color: 140; 90; 199
+          Enabled: true
+          Head Diameter: 0.05000000074505806
+          Head Length: 0.05000000074505806
+          Length: 0.30000001192092896
+          Line Style: Billboards
+          Line Width: 0.07000000029802322
+          Name: Branch P3 validated rollout (ancillary_rollout_3)
+          Offset:
+            X: 0
+            Y: 0
+            Z: 0.01
+          Pose Color: 140; 90; 199
+          Pose Style: None
+          Radius: 0.029999999329447746
+          Shaft Diameter: 0.009999999776482582
+          Shaft Length: 0.10000000149011612
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /tgmppi/ancillary_rollout_3
+          Value: true
+        - Alpha: 0.8
+          Buffer Length: 1
+          Class: rviz_default_plugins/Path
+          Color: 74; 58; 167
+          Enabled: true
+          Head Diameter: 0.05000000074505806
+          Head Length: 0.05000000074505806
+          Length: 0.30000001192092896
+          Line Style: Billboards
+          Line Width: 0.05000000074505806
+          Name: Global plan as tracked (A* contract, /transformed_global_plan)
+          Offset:
+            X: 0
+            Y: 0
+            Z: 0
+          Pose Color: 74; 58; 167
+          Pose Style: None
+          Radius: 0.029999999329447746
+          Shaft Diameter: 0.009999999776482582
+          Shaft Length: 0.10000000149011612
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /transformed_global_plan
+          Value: true
+      Enabled: true
+      Name: TG-MPPI (topology-guided sampling)
+    - Class: rviz_common/Group
+      Displays:
+        - Class: rviz_default_plugins/Image
+          Enabled: false
+          Max Value: 1
+          Median window: 5
+          Min Value: 0
+          Name: "Depth camera RGB (/susag/depth_camera/image_raw) [off by default; enabling it has crashed rviz2 in librclcpp, see PROJECT_STATUS 2026-09-09]"
+          Normalize Range: true
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            History Policy: Keep Last
+            Reliability Policy: Best Effort
+            Value: /susag/depth_camera/image_raw
+          Value: false
+        - Class: rviz_default_plugins/Image
+          Enabled: false
+          Max Value: 1
+          Median window: 5
+          Min Value: 0
+          Name: "Depth camera depth (/susag/depth_camera/depth/image_raw) [off by default; same rviz2 crash risk as the RGB display]"
+          Normalize Range: true
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            History Policy: Keep Last
+            Reliability Policy: Best Effort
+            Value: /susag/depth_camera/depth/image_raw
+          Value: false
         - Alpha: 1
           Autocompute Intensity Bounds: true
           Autocompute Value Bounds:
@@ -481,13 +740,13 @@ Visualization Manager:
           Color: 255; 255; 255
           Color Transformer: RGB8
           Decay Time: 0
-          Enabled: true
+          Enabled: false
           Invert Rainbow: false
           Max Color: 255; 255; 255
           Max Intensity: 4096
           Min Color: 0; 0; 0
           Min Intensity: 0
-          Name: RealsenseDepthImage
+          Name: "Depth camera cloud (/susag/depth_camera/points) [off by default; ~920k points at 30 Hz]"
           Position Transformer: XYZ
           Selectable: true
           Size (Pixels): 3
@@ -497,13 +756,13 @@ Visualization Manager:
             Depth: 5
             Durability Policy: Volatile
             History Policy: Keep Last
-            Reliability Policy: Reliable
-            Value: /intel_realsense_r200_depth/points
+            Reliability Policy: Best Effort
+            Value: /susag/depth_camera/points
           Use Fixed Frame: true
           Use rainbow: true
-          Value: true
+          Value: false
       Enabled: false
-      Name: Realsense
+      Name: Depth camera (sim topics)
     - Class: rviz_default_plugins/MarkerArray
       Enabled: true
       Name: MarkerArray

@@ -1,0 +1,63 @@
+[INFO] [launch]: All log files can be found below /home/saran/.ros/log/2026-07-15-16-02-53-953251-aorus-139709
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [robot_state_publisher-1]: process started with pid [139972]
+[INFO] [joint_state_publisher-2]: process started with pid [139974]
+[INFO] [gzserver-3]: process started with pid [139976]
+[INFO] [spawn_entity.py-4]: process started with pid [139978]
+[INFO] [ros2_laser_scan_merger-5]: process started with pid [139980]
+[INFO] [pointcloud_to_laserscan_node-6]: process started with pid [139983]
+[ERROR] [gzserver-3]: process has died [pid 139976, exit code 255, cmd 'gzserver /home/saran/robohouse_ws/src/BARN_dataset/world_files/world_93.world -slibgazebo_ros_init.so -slibgazebo_ros_factory.so -slibgazebo_ros_force_system.so'].
+[ros2_laser_scan_merger-5] [INFO] [1784124175.272504490] [ros2_laser_scan_merger]: Hello
+[pointcloud_to_laserscan_node-6] [INFO] [1784124175.276387583] [pointcloud_to_laserscan]: Got a subscriber to laserscan, starting pointcloud subscriber
+[robot_state_publisher-1] Warning: link 'laser_center_link' material 'yellow' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] Warning: link 'laser_center_link' material 'yellow' undefined.
+[robot_state_publisher-1]          at line 84 in ./urdf_parser/src/model.cpp
+[robot_state_publisher-1] [WARN] [1784124175.300237868] [kdl_parser]: The root link base_link has an inertia specified in the URDF, but KDL does not support a root link with an inertia.  As a workaround, you can add an extra dummy link to your URDF.
+[robot_state_publisher-1] [INFO] [1784124175.300352595] [robot_state_publisher]: got segment base_link
+[robot_state_publisher-1] [INFO] [1784124175.300425827] [robot_state_publisher]: got segment front_left_wheel_1
+[robot_state_publisher-1] [INFO] [1784124175.300438002] [robot_state_publisher]: got segment front_lidar_1
+[robot_state_publisher-1] [INFO] [1784124175.300447127] [robot_state_publisher]: got segment front_right_wheel_1
+[robot_state_publisher-1] [INFO] [1784124175.300455670] [robot_state_publisher]: got segment imu_link
+[robot_state_publisher-1] [INFO] [1784124175.300463865] [robot_state_publisher]: got segment laser_center_link
+[robot_state_publisher-1] [INFO] [1784124175.300471969] [robot_state_publisher]: got segment real_sense_1
+[robot_state_publisher-1] [INFO] [1784124175.300480033] [robot_state_publisher]: got segment rear_left_wheel_1
+[robot_state_publisher-1] [INFO] [1784124175.300488271] [robot_state_publisher]: got segment rear_lidar_1
+[robot_state_publisher-1] [INFO] [1784124175.300496507] [robot_state_publisher]: got segment rear_right_wheel_1
+[joint_state_publisher-2] [INFO] [1784124175.305535556] [joint_state_publisher]: Waiting for robot_description to be published on the robot_description topic...
+[spawn_entity.py-4] [INFO] [1784124175.312260084] [spawn_entity]: Spawn Entity started
+[spawn_entity.py-4] [INFO] [1784124175.312859768] [spawn_entity]: Loading entity published on topic robot_description
+[spawn_entity.py-4] [INFO] [1784124175.314213717] [spawn_entity]: Waiting for entity xml on robot_description
+[spawn_entity.py-4] [INFO] [1784124175.325244274] [spawn_entity]: Waiting for service /spawn_entity, timeout = 30
+[spawn_entity.py-4] [INFO] [1784124175.325440183] [spawn_entity]: Waiting for service /spawn_entity
+[spawn_entity.py-4] [INFO] [1784124175.327828693] [spawn_entity]: Calling service /spawn_entity
+[pointcloud_to_laserscan_node-6] [WARN] [1784124189.207479198] [pointcloud_to_laserscan]: New subscription discovered on topic '/scan', requesting incompatible QoS. No messages will be sent to it. Last incompatible policy: RELIABILITY_QOS_POLICY
+[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
+[ros2_laser_scan_merger-5] [INFO] [1784124233.873485819] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[robot_state_publisher-1] [INFO] [1784124233.873643541] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[pointcloud_to_laserscan_node-6] [INFO] [1784124233.873681977] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[spawn_entity.py-4] Traceback (most recent call last):
+[spawn_entity.py-4]   File "/opt/ros/humble/lib/gazebo_ros/spawn_entity.py", line 372, in <module>
+[spawn_entity.py-4]     main()
+[spawn_entity.py-4]   File "/opt/ros/humble/lib/gazebo_ros/spawn_entity.py", line 367, in main
+[spawn_entity.py-4]     exit_code = spawn_entity_node.run()
+[spawn_entity.py-4]   File "/opt/ros/humble/lib/gazebo_ros/spawn_entity.py", line 228, in run
+[spawn_entity.py-4]     success = self._spawn_entity(entity_xml, initial_pose, spawn_service_timeout)
+[spawn_entity.py-4]   File "/opt/ros/humble/lib/gazebo_ros/spawn_entity.py", line 290, in _spawn_entity
+[spawn_entity.py-4]     rclpy.spin_once(self)
+[spawn_entity.py-4]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/__init__.py", line 208, in spin_once
+[spawn_entity.py-4]     executor.spin_once(timeout_sec=timeout_sec)
+[spawn_entity.py-4]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 808, in spin_once
+[spawn_entity.py-4]     self._spin_once_impl(timeout_sec)
+[spawn_entity.py-4]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 797, in _spin_once_impl
+[spawn_entity.py-4]     handler, entity, node = self.wait_for_ready_callbacks(timeout_sec=timeout_sec)
+[spawn_entity.py-4]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 780, in wait_for_ready_callbacks
+[spawn_entity.py-4]     return next(self._cb_iter)
+[spawn_entity.py-4]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 677, in _wait_for_ready_callbacks
+[spawn_entity.py-4]     wait_set.wait(timeout_nsec)
+[spawn_entity.py-4] KeyboardInterrupt
+[ERROR] [spawn_entity.py-4]: process has died [pid 139978, exit code -2, cmd '/opt/ros/humble/lib/gazebo_ros/spawn_entity.py -entity susag_updated_model -topic robot_description -x -2.25 -y 1.0 -z 0.1 -Y 1.5708 --ros-args'].
+[INFO] [robot_state_publisher-1]: process has finished cleanly [pid 139972]
+[INFO] [ros2_laser_scan_merger-5]: process has finished cleanly [pid 139980]
+[INFO] [pointcloud_to_laserscan_node-6]: process has finished cleanly [pid 139983]
+[INFO] [joint_state_publisher-2]: process has finished cleanly [pid 139974]

@@ -1,3 +1,0 @@
-controller,scenario,rep,success,time_s,path_len_m,min_clear_m,stall_s,result_code
-amoeba,S1_pillar,0,1,29.41,11.84,0.662,0.1,4
-amoeba,S1_pillar,1,1,29.31,11.84,0.666,0.18,4
