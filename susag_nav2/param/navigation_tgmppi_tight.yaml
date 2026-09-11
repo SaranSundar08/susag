@@ -173,6 +173,14 @@ controller_server:
       time_steps: 56
       model_dt: 0.05
       batch_size: 2000
+      compute_backend: "cuda"   # GPU rollout + CostCritic/GoalCritic/FlowFieldCritic/
+                                # 5 elementwise critics chained; PathAlignCritic stays
+                                # CPU-only. Real live measurement (2026-09-11): 4.87ms/
+                                # cycle avg vs 8.45ms/cycle on "cpu" -- ~1.73x end-to-end
+                                # speedup. Falls back to "cpu" automatically if no CUDA
+                                # device is found or this .so wasn't built with
+                                # -DTGMPPI_WITH_CUDA=ON. See PROJECT_STATUS.md.
+
       vx_std: 0.3   # let MPPI explore slowing down before tight turns
       vy_std: 0.2
       wz_std: 0.7   # broader angular exploration for tight BARN corners

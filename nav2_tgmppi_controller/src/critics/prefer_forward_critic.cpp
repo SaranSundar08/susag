@@ -13,6 +13,10 @@
 // limitations under the License.
 
 #include "nav2_tgmppi_controller/critics/prefer_forward_critic.hpp"
+#ifdef TGMPPI_WITH_CUDA
+#include <cstring>
+#include "nav2_tgmppi_controller/tools/gpu_rollout.hpp"
+#endif
 
 namespace tgmppi::critics
 {
@@ -28,6 +32,10 @@ void PreferForwardCritic::initialize()
 
   RCLCPP_INFO(
     logger_, "PreferForwardCritic instantiated with %d power and %f weight.", power_, weight_);
+
+#ifdef TGMPPI_WITH_CUDA
+  gpu_critics_.initialize();
+#endif
 }
 
 void PreferForwardCritic::score(CriticData & data)
@@ -38,6 +46,24 @@ void PreferForwardCritic::score(CriticData & data)
   {
     return;
   }
+
+#ifdef TGMPPI_WITH_CUDA
+  if (data.compute_backend == "cuda" && gpu_critics_.ready()) {
+    auto cost_out = xt::xtensor<float, 1>::from_shape({data.costs.shape(0)});
+    if (data.gpu_rollout != nullptr) {
+      const auto * rollout = static_cast<const GpuRollout *>(data.gpu_rollout);
+      auto cost_gpu = gpu_critics_.preferForwardCriticDevice(
+        rollout->vx(), data.model_dt, weight_, power_);
+      auto cost_cpu = cost_gpu.to(torch::kCPU).contiguous();
+      std::memcpy(
+        cost_out.data(), cost_cpu.data_ptr<float>(), cost_out.size() * sizeof(float));
+    } else {
+      gpu_critics_.preferForwardCriticScore(data.state, data.model_dt, weight_, power_, cost_out);
+    }
+    data.costs += cost_out;
+    return;
+  }
+#endif
 
   auto backward_motion = xt::maximum(-data.state.vx, 0);
   data.costs += xt::pow(

@@ -14,6 +14,10 @@
 // limitations under the License.
 
 #include "nav2_tgmppi_controller/critics/goal_critic.hpp"
+#ifdef TGMPPI_WITH_CUDA
+#include <cstring>
+#include "nav2_tgmppi_controller/tools/gpu_rollout.hpp"
+#endif
 
 namespace tgmppi::critics
 {
@@ -31,6 +35,10 @@ void GoalCritic::initialize()
   RCLCPP_INFO(
     logger_, "GoalCritic instantiated with %d power and %f weight.",
     power_, weight_);
+
+#ifdef TGMPPI_WITH_CUDA
+  gpu_critic_.initialize();
+#endif
 }
 
 void GoalCritic::score(CriticData & data)
@@ -45,6 +53,29 @@ void GoalCritic::score(CriticData & data)
 
   const auto goal_x = data.path.x(goal_idx);
   const auto goal_y = data.path.y(goal_idx);
+
+#ifdef TGMPPI_WITH_CUDA
+  if (data.compute_backend == "cuda" && gpu_critic_.ready()) {
+    auto cost_out = xt::xtensor<float, 1>::from_shape({data.costs.shape(0)});
+    if (data.gpu_rollout != nullptr) {
+      // Chained: reads the rollout's already-resident trajectory tensors
+      // directly. No upload of our own at all -- goal_x/goal_y are two
+      // scalar kernel arguments, not tensors -- just a [K] download at
+      // the end. The cheapest possible addition to the shared
+      // data.gpu_rollout pipeline (see PROJECT_STATUS.md 2026-09-10).
+      const auto * rollout = static_cast<const GpuRollout *>(data.gpu_rollout);
+      auto cost_gpu = gpu_critic_.computeDevice(
+        rollout->trajX(), rollout->trajY(), goal_x, goal_y, weight_, power_);
+      auto cost_cpu = cost_gpu.to(torch::kCPU).contiguous();
+      std::memcpy(
+        cost_out.data(), cost_cpu.data_ptr<float>(), cost_out.size() * sizeof(float));
+    } else {
+      gpu_critic_.score(data.trajectories, goal_x, goal_y, weight_, power_, cost_out);
+    }
+    data.costs += cost_out;
+    return;
+  }
+#endif
 
   const auto traj_x = xt::view(data.trajectories.x, xt::all(), xt::all());
   const auto traj_y = xt::view(data.trajectories.y, xt::all(), xt::all());

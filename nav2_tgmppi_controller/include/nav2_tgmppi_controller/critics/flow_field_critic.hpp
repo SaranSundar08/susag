@@ -16,6 +16,9 @@
 #define NAV2_TGMPPI_CONTROLLER__CRITICS__FLOW_FIELD_CRITIC_HPP_
 
 #include "nav2_tgmppi_controller/critic_function.hpp"
+#ifdef TGMPPI_WITH_CUDA
+#include "nav2_tgmppi_controller/tools/gpu_flow_field_critic.hpp"
+#endif
 
 namespace tgmppi::critics
 {
@@ -42,6 +45,10 @@ protected:
   unsigned int power_{1};
   float weight_{5.0f};
   float running_weight_{2.0f};
+
+#ifdef TGMPPI_WITH_CUDA
+  GpuFlowFieldCritic gpu_critic_;
+#endif
 };
 
 }  // namespace tgmppi::critics

@@ -14,6 +14,10 @@
 
 #include "nav2_tgmppi_controller/critics/goal_angle_critic.hpp"
 #include "angles/angles.h"
+#ifdef TGMPPI_WITH_CUDA
+#include <cstring>
+#include "nav2_tgmppi_controller/tools/gpu_rollout.hpp"
+#endif
 namespace tgmppi::critics
 {
 
@@ -32,6 +36,10 @@ void GoalAngleCritic::initialize()
     "GoalAngleCritic instantiated with %d power, %f weight, %f "
     "angular threshold and symmetric_yaw_tolerance %s",
     power_, weight_, threshold_to_consider_, symmetric_yaw_tolerance_ ? "enabled" : "disabled");
+
+#ifdef TGMPPI_WITH_CUDA
+  gpu_critics_.initialize();
+#endif
 }
 
 void GoalAngleCritic::score(CriticData & data)
@@ -44,6 +52,24 @@ void GoalAngleCritic::score(CriticData & data)
 
   const auto goal_idx = data.path.x.shape(0) - 1;
   const float goal_yaw = data.path.yaws(goal_idx);
+
+#ifdef TGMPPI_WITH_CUDA
+  if (data.compute_backend == "cuda" && gpu_critics_.ready() && !symmetric_yaw_tolerance_) {
+    auto cost_out = xt::xtensor<float, 1>::from_shape({data.costs.shape(0)});
+    if (data.gpu_rollout != nullptr) {
+      const auto * rollout = static_cast<const GpuRollout *>(data.gpu_rollout);
+      auto cost_gpu = gpu_critics_.goalAngleCriticDevice(
+        rollout->trajYaws(), goal_yaw, weight_, power_);
+      auto cost_cpu = cost_gpu.to(torch::kCPU).contiguous();
+      std::memcpy(
+        cost_out.data(), cost_cpu.data_ptr<float>(), cost_out.size() * sizeof(float));
+    } else {
+      gpu_critics_.goalAngleCriticScore(data.trajectories, goal_yaw, weight_, power_, cost_out);
+    }
+    data.costs += cost_out;
+    return;
+  }
+#endif
 
   auto angular_distances =
     xt::eval(xt::fabs(utils::shortest_angular_distance(data.trajectories.yaws, goal_yaw)));

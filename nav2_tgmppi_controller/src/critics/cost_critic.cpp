@@ -16,6 +16,10 @@
 #include <cmath>
 #include "nav2_tgmppi_controller/critics/cost_critic.hpp"
 #include "nav2_core/exceptions.hpp"
+#ifdef TGMPPI_WITH_CUDA
+#include <cstring>
+#include "nav2_tgmppi_controller/tools/gpu_rollout.hpp"
+#endif
 
 namespace tgmppi::critics
 {
@@ -71,6 +75,10 @@ void CostCritic::initialize()
     "Critic will collision check based on %s cost.",
     power_, critical_cost_, weight_, consider_footprint_ ?
     "footprint" : "circular");
+
+#ifdef TGMPPI_WITH_CUDA
+  gpu_critic_.initialize();
+#endif
 }
 
 float CostCritic::findCircumscribedCost(
@@ -141,6 +149,45 @@ void CostCritic::score(CriticData & data)
 
   const size_t traj_len = data.trajectories.x.shape(1);
   bool all_trajectories_collide = true;
+
+#ifdef TGMPPI_WITH_CUDA
+  if (data.compute_backend == "cuda" && !consider_footprint_ && gpu_critic_.ready()) {
+    const bool is_tracking_unknown = costmap_ros_->getLayeredCostmap()->isTrackingUnknown();
+    if (data.gpu_rollout != nullptr) {
+      // Chained path: the rollout already left its trajectory tensors
+      // resident on the GPU this cycle -- read them directly instead of
+      // re-uploading trajectories.x/y ourselves. Only the costmap (our own
+      // data, not something the optimizer already uploaded) needs a fresh
+      // upload here. This is the fix for the round-trip overhead
+      // documented in PROJECT_STATUS.md 2026-09-10 (slice 2): the two
+      // pieces chained this way now share ONE upload instead of two.
+      const auto * rollout = static_cast<const GpuRollout *>(data.gpu_rollout);
+      auto grid = GpuCostCritic::uploadCostmap(*costmap_);
+      auto repulsive_gpu = gpu_critic_.computeDevice(
+        rollout->trajX(), rollout->trajY(), grid,
+        static_cast<int64_t>(costmap_->getSizeInCellsX()),
+        static_cast<int64_t>(costmap_->getSizeInCellsY()),
+        costmap_->getOriginX(), costmap_->getOriginY(), costmap_->getResolution(),
+        is_tracking_unknown, critical_cost_, collision_cost_, near_goal,
+        all_trajectories_collide);
+      auto repulsive_cpu = repulsive_gpu.to(torch::kCPU).contiguous();
+      std::memcpy(
+        repulsive_cost.data(), repulsive_cpu.data_ptr<float>(),
+        repulsive_cost.size() * sizeof(float));
+    } else {
+      // Standalone fallback (e.g. rollout didn't run on GPU this cycle):
+      // uploads trajectories.x/y itself, same as slice 2's original path.
+      gpu_critic_.score(
+        data.trajectories, *costmap_, is_tracking_unknown,
+        critical_cost_, collision_cost_, near_goal,
+        repulsive_cost, all_trajectories_collide);
+    }
+    data.costs += xt::pow((weight_ * repulsive_cost / traj_len), power_);
+    data.fail_flag = all_trajectories_collide;
+    return;
+  }
+#endif
+
   for (size_t i = 0; i < data.trajectories.x.shape(0); ++i) {
     bool trajectory_collide = false;
     const auto & traj = data.trajectories;

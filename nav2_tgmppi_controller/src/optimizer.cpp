@@ -132,6 +132,24 @@ void Optimizer::getParams()
   getParam(s.flow_wait_fraction, "flow_wait_fraction", 0.20f);
   getParam(s.flow_rejoin_lateral_weight, "flow_rejoin_lateral_weight", 3.0f);
   getParam(s.flow_rejoin_remaining_weight, "flow_rejoin_remaining_weight", 2.0f);
+
+  getParam(s.compute_backend, "compute_backend", std::string("cpu"));
+  if (s.compute_backend != "cpu" && s.compute_backend != "cuda") {
+    RCLCPP_WARN(
+      logger_, "[TG-MPPI] compute_backend '%s' not recognized, using 'cpu'",
+      s.compute_backend.c_str());
+    s.compute_backend = "cpu";
+  }
+#ifndef TGMPPI_WITH_CUDA
+  if (s.compute_backend == "cuda") {
+    RCLCPP_WARN(
+      logger_,
+      "[TG-MPPI] compute_backend:'cuda' requested but this build has no "
+      "LibTorch/CUDA support (built without -DTGMPPI_WITH_CUDA=ON) -- "
+      "falling back to 'cpu'");
+    s.compute_backend = "cpu";
+  }
+#endif
   RCLCPP_INFO(
     logger_,
     "[TG-MPPI] flow mode: water field over local costmap (reflood every %d "
@@ -191,7 +209,21 @@ void Optimizer::reset()
   generated_trajectories_.reset(settings_.batch_size, settings_.time_steps);
 
   noise_generator_.reset(settings_, isHolonomic());
-  RCLCPP_INFO(logger_, "Optimizer reset");
+
+#ifdef TGMPPI_WITH_CUDA
+  if (settings_.compute_backend == "cuda") {
+    gpu_rollout_.initialize(settings_.batch_size, settings_.time_steps);
+    if (!gpu_rollout_.ready()) {
+      RCLCPP_WARN(
+        logger_,
+        "[TG-MPPI] compute_backend:'cuda' requested but no CUDA device is "
+        "available at runtime -- falling back to 'cpu' for this session");
+      settings_.compute_backend = "cpu";
+    }
+  }
+#endif
+  RCLCPP_INFO(
+    logger_, "Optimizer reset (compute_backend=%s)", settings_.compute_backend.c_str());
 }
 
 geometry_msgs::msg::TwistStamped Optimizer::evalControl(
@@ -199,11 +231,23 @@ geometry_msgs::msg::TwistStamped Optimizer::evalControl(
   const geometry_msgs::msg::Twist & robot_speed,
   const nav_msgs::msg::Path & plan, nav2_core::GoalChecker * goal_checker)
 {
+  const auto cycle_t0 = std::chrono::steady_clock::now();
+
   prepare(robot_pose, robot_speed, plan, goal_checker);
 
   do {
     optimize();
   } while (fallback(critics_data_.fail_flag));
+
+  cycle_log_sum_ms_ += std::chrono::duration<double, std::milli>(
+    std::chrono::steady_clock::now() - cycle_t0).count();
+  if (++cycle_log_count_ >= kCycleLogEvery) {
+    RCLCPP_INFO(
+      logger_, "[TG-MPPI] cycle time (compute_backend=%s): %.3f ms/cycle avg over %u cycles",
+      settings_.compute_backend.c_str(), cycle_log_sum_ms_ / cycle_log_count_, cycle_log_count_);
+    cycle_log_count_ = 0;
+    cycle_log_sum_ms_ = 0.0;
+  }
 
   utils::savitskyGolayFilter(control_sequence_, control_history_, settings_);
   auto control = getControlFromSequenceAsTwist(plan.header.stamp);
@@ -308,6 +352,17 @@ void Optimizer::generateNoisedTrajectories()
   } else {
     applyFlowBias();  // water field: bend the sampling mean downhill
   }
+
+#ifdef TGMPPI_WITH_CUDA
+  if (settings_.compute_backend == "cuda" && gpu_rollout_.ready()) {
+    // state_.cvx/cvy/cwz already carry this cycle's noise (+ TG-MPPI bias,
+    // if applied above) -- predict + integrate run on the GPU, then write
+    // the same state_.vx/vy/wz + generated_trajectories_ every critic and
+    // the visualizer already read, unchanged either way.
+    gpu_rollout_.rollout(state_, state_, generated_trajectories_, settings_.model_dt, isHolonomic());
+    return;
+  }
+#endif
   updateStateVelocities(state_);
   integrateStateVelocities(generated_trajectories_, state_);
 }

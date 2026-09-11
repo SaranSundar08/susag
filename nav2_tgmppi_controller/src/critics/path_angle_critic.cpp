@@ -16,6 +16,10 @@
 #include "nav2_tgmppi_controller/critics/path_angle_critic.hpp"
 
 #include <math.h>
+#ifdef TGMPPI_WITH_CUDA
+#include <cstring>
+#include "nav2_tgmppi_controller/tools/gpu_rollout.hpp"
+#endif
 
 namespace tgmppi::critics
 {
@@ -53,6 +57,10 @@ void PathAngleCritic::initialize()
     logger_,
     "PathAngleCritic instantiated with %d power and %f weight. Reversing %s",
     power_, weight_, reversing_allowed_ ? "allowed." : "not allowed.");
+
+#ifdef TGMPPI_WITH_CUDA
+  gpu_critics_.initialize();
+#endif
 }
 
 void PathAngleCritic::score(CriticData & data)
@@ -79,6 +87,31 @@ void PathAngleCritic::score(CriticData & data)
   {
     return;
   }
+
+#ifdef TGMPPI_WITH_CUDA
+  // GPU path only covers forward_preference:true (no reversing-correction
+  // branch) -- the active campaign config's own setting, see
+  // gpu_elementwise_critics.hpp's docstring.
+  if (data.compute_backend == "cuda" && gpu_critics_.ready() &&
+    !(reversing_allowed_ && !forward_preference_))
+  {
+    auto cost_out = xt::xtensor<float, 1>::from_shape({data.costs.shape(0)});
+    if (data.gpu_rollout != nullptr) {
+      const auto * rollout = static_cast<const GpuRollout *>(data.gpu_rollout);
+      auto cost_gpu = gpu_critics_.pathAngleCriticDevice(
+        rollout->trajX(), rollout->trajY(), rollout->trajYaws(),
+        goal_x, goal_y, weight_, power_);
+      auto cost_cpu = cost_gpu.to(torch::kCPU).contiguous();
+      std::memcpy(
+        cost_out.data(), cost_cpu.data_ptr<float>(), cost_out.size() * sizeof(float));
+    } else {
+      gpu_critics_.pathAngleCriticScore(
+        data.trajectories, goal_x, goal_y, weight_, power_, cost_out);
+    }
+    data.costs += cost_out;
+    return;
+  }
+#endif
 
   auto yaws_between_points = xt::atan2(
     goal_y - data.trajectories.y,

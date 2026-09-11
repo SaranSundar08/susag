@@ -16,6 +16,10 @@
 
 #include <xtensor/xmath.hpp>
 #include <xtensor/xsort.hpp>
+#ifdef TGMPPI_WITH_CUDA
+#include <cstring>
+#include "nav2_tgmppi_controller/tools/gpu_rollout.hpp"
+#endif
 
 namespace tgmppi::critics
 {
@@ -30,6 +34,10 @@ void PathFollowCritic::initialize()
   getParam(offset_from_furthest_, "offset_from_furthest", 6);
   getParam(power_, "cost_power", 1);
   getParam(weight_, "cost_weight", 5.0);
+
+#ifdef TGMPPI_WITH_CUDA
+  gpu_critics_.initialize();
+#endif
 }
 
 void PathFollowCritic::score(CriticData & data)
@@ -59,6 +67,25 @@ void PathFollowCritic::score(CriticData & data)
 
   const auto path_x = data.path.x(offseted_idx);
   const auto path_y = data.path.y(offseted_idx);
+
+#ifdef TGMPPI_WITH_CUDA
+  if (data.compute_backend == "cuda" && gpu_critics_.ready()) {
+    auto cost_out = xt::xtensor<float, 1>::from_shape({data.costs.shape(0)});
+    if (data.gpu_rollout != nullptr) {
+      const auto * rollout = static_cast<const GpuRollout *>(data.gpu_rollout);
+      auto cost_gpu = gpu_critics_.pathFollowCriticDevice(
+        rollout->trajX(), rollout->trajY(), path_x, path_y, weight_, power_);
+      auto cost_cpu = cost_gpu.to(torch::kCPU).contiguous();
+      std::memcpy(
+        cost_out.data(), cost_cpu.data_ptr<float>(), cost_out.size() * sizeof(float));
+    } else {
+      gpu_critics_.pathFollowCriticScore(
+        data.trajectories, path_x, path_y, weight_, power_, cost_out);
+    }
+    data.costs += cost_out;
+    return;
+  }
+#endif
 
   const auto last_x = xt::view(data.trajectories.x, xt::all(), -1);
   const auto last_y = xt::view(data.trajectories.y, xt::all(), -1);

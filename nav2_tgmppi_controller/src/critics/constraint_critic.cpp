@@ -13,6 +13,10 @@
 // limitations under the License.
 
 #include "nav2_tgmppi_controller/critics/constraint_critic.hpp"
+#ifdef TGMPPI_WITH_CUDA
+#include <cstring>
+#include "nav2_tgmppi_controller/tools/gpu_rollout.hpp"
+#endif
 
 namespace tgmppi::critics
 {
@@ -36,6 +40,10 @@ void ConstraintCritic::initialize()
   const float min_sgn = vx_min > 0.0 ? 1.0 : -1.0;
   max_vel_ = sqrtf(vx_max * vx_max + vy_max * vy_max);
   min_vel_ = min_sgn * sqrtf(vx_min * vx_min + vy_max * vy_max);
+
+#ifdef TGMPPI_WITH_CUDA
+  gpu_critics_.initialize();
+#endif
 }
 
 void ConstraintCritic::score(CriticData & data)
@@ -46,12 +54,32 @@ void ConstraintCritic::score(CriticData & data)
     return;
   }
 
+  auto acker = dynamic_cast<AckermannMotionModel *>(data.motion_model.get());
+
+#ifdef TGMPPI_WITH_CUDA
+  if (data.compute_backend == "cuda" && gpu_critics_.ready() && acker == nullptr) {
+    auto cost_out = xt::xtensor<float, 1>::from_shape({data.costs.shape(0)});
+    if (data.gpu_rollout != nullptr) {
+      const auto * rollout = static_cast<const GpuRollout *>(data.gpu_rollout);
+      auto cost_gpu = gpu_critics_.constraintCriticDevice(
+        rollout->vx(), rollout->vy(), data.model_dt, max_vel_, min_vel_, weight_, power_);
+      auto cost_cpu = cost_gpu.to(torch::kCPU).contiguous();
+      std::memcpy(
+        cost_out.data(), cost_cpu.data_ptr<float>(), cost_out.size() * sizeof(float));
+    } else {
+      gpu_critics_.constraintCriticScore(
+        data.state, data.model_dt, max_vel_, min_vel_, weight_, power_, cost_out);
+    }
+    data.costs += cost_out;
+    return;
+  }
+#endif
+
   auto sgn = xt::where(data.state.vx > 0.0, 1.0, -1.0);
   auto vel_total = sgn * xt::sqrt(data.state.vx * data.state.vx + data.state.vy * data.state.vy);
   auto out_of_max_bounds_motion = xt::maximum(vel_total - max_vel_, 0);
   auto out_of_min_bounds_motion = xt::maximum(min_vel_ - vel_total, 0);
 
-  auto acker = dynamic_cast<AckermannMotionModel *>(data.motion_model.get());
   if (acker != nullptr) {
     auto & vx = data.state.vx;
     auto & wz = data.state.wz;

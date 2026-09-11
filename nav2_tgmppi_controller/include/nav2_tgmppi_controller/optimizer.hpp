@@ -18,6 +18,7 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <chrono>
 
 #include <xtensor/xtensor.hpp>
 #include <xtensor/xview.hpp>
@@ -45,6 +46,9 @@
 #include "nav2_tgmppi_controller/tools/noise_generator.hpp"
 #include "nav2_tgmppi_controller/tools/parameters_handler.hpp"
 #include "nav2_tgmppi_controller/tools/utils.hpp"
+#ifdef TGMPPI_WITH_CUDA
+#include "nav2_tgmppi_controller/tools/gpu_rollout.hpp"
+#endif
 
 #ifdef __APPLE__
   #include "nav2_tgmppi_controller/tools/apple_utils.hpp"
@@ -297,6 +301,12 @@ protected:
   // Flow mode: the water field over the local costmap + re-flood cycle count.
   FlowField flow_field_;
   unsigned int flow_cycle_{0};
+#ifdef TGMPPI_WITH_CUDA
+  // compute_backend:"cuda" -- see generateNoisedTrajectories(). Absent
+  // entirely (not just inert) from a default build; no LibTorch dependency
+  // unless built with -DTGMPPI_WITH_CUDA=ON.
+  GpuRollout gpu_rollout_;
+#endif
   rclcpp_lifecycle::LifecyclePublisher<visualization_msgs::msg::MarkerArray>::SharedPtr
     tgmppi_debug_pub_;
   std::array<rclcpp_lifecycle::LifecyclePublisher<nav_msgs::msg::Path>::SharedPtr, 3>
@@ -322,9 +332,26 @@ protected:
 
   CriticData critics_data_ =
   {state_, generated_trajectories_, path_, costs_, settings_.model_dt, false, nullptr, nullptr,
-    std::nullopt, std::nullopt, nullptr};  /// Caution, keep references
+    std::nullopt, std::nullopt, nullptr, settings_.compute_backend,
+#ifdef TGMPPI_WITH_CUDA
+    &gpu_rollout_
+#else
+    nullptr
+#endif
+  };  /// Caution, keep references
 
   rclcpp::Logger logger_{rclcpp::get_logger("TgMppiController")};
+
+  // Real end-to-end cycle timing (2026-09-11): logs a rolling average of
+  // evalControl()'s prepare()+optimize() wall time every kCycleLogEvery
+  // calls, tagged with compute_backend, so a live Nav2 run gives a real
+  // number for the actual full cycle (noise gen + tgmppi bias + rollout +
+  // every critic + softmax) instead of a synthetic component slice --
+  // see PROJECT_STATUS.md 2026-09-11's closing entry on why every number
+  // up to this point was a benchmark, not the real thing.
+  static constexpr unsigned int kCycleLogEvery = 50;
+  unsigned int cycle_log_count_{0};
+  double cycle_log_sum_ms_{0.0};
 };
 
 template<typename E>

@@ -103,6 +103,10 @@ public:
   float originX() const {return ox_;}
   float originY() const {return oy_;}
   float cellDist(int i, int j) const {return D_[idx(i, j)];}
+  // Bulk accessor for GpuFlowFieldCritic: the whole [ny*nx] distance grid,
+  // row-major (index = j*nx+i, matching idx()), for one-shot GPU upload
+  // instead of a cellDist() call per point.
+  const std::vector<float> & distGrid() const {return D_;}
   bool cellWet(int i, int j) const {return D_[idx(i, j)] < kWetLimit;}
   bool cellBody(int i, int j) const {return body_[idx(i, j)] != 0;}
   bool cellMembrane(int i, int j) const {return membrane_[idx(i, j)] != 0;}

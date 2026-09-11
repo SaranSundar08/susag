@@ -55,6 +55,24 @@ struct CriticData
   // Water field built by the optimizer in flow mode; nullptr in ray mode.
   // FlowFieldCritic scores trajectories against it.
   const FlowField * flow_field{nullptr};
+
+  // "cpu" (always) or "cuda" (only if the optimizer's GPU backend is built
+  // AND ready at runtime -- see Optimizer::reset()). A critic with a GPU
+  // implementation checks this and falls back to its CPU path whenever
+  // it's "cpu", exactly like Optimizer::generateNoisedTrajectories() does.
+  const std::string & compute_backend;
+
+  // Opaque tgmppi::GpuRollout* (cast only where TGMPPI_WITH_CUDA is
+  // defined), non-null iff this cycle's rollout ran on the GPU. Lets a
+  // GPU-capable critic (e.g. CostCritic) read the already-resident
+  // trajectory tensors directly -- via GpuRollout::trajX()/trajY() -- and
+  // chain its own compute onto them with no CPU round-trip in between,
+  // instead of every GPU critic re-uploading trajectories.x/y itself.
+  // Two additively-ported critics that each did their own independent
+  // round trip (see PROJECT_STATUS.md 2026-09-10, slices 1 and 2) both
+  // ended up SLOWER than CPU purely from that overhead -- this is the
+  // fix, one shared upload consumed by every critic that can use it.
+  const void * gpu_rollout{nullptr};
 };
 
 }  // namespace tgmppi

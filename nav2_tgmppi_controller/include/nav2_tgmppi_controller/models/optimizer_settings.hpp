@@ -40,6 +40,11 @@ struct OptimizerSettings
   bool shift_control_sequence{false};
   size_t retry_attempt_limit{0};
 
+  // "cpu" (xtensor, default -- always available) or "cuda" (LibTorch GPU
+  // rollout, only exists if built with -DTGMPPI_WITH_CUDA=ON; silently
+  // falls back to "cpu" if requested but unavailable at build or run time).
+  std::string compute_backend{"cpu"};
+
   // --- TgMppi shape-conditioned sampling (this controller's core behavior) ---
   float tgmppi_bias_strength{0.6f};   // fraction of the batch seeded onto the wrap modes
   float tgmppi_bias_gain{1.5f};       // heading P-gain: tangent bearing error -> yaw rate

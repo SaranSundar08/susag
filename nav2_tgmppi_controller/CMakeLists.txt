@@ -15,6 +15,21 @@ find_package(ament_cmake REQUIRED)
 find_package(xtensor REQUIRED)
 find_package(xsimd REQUIRED)
 
+# Optional GPU compute_backend (compute_backend:"cuda" param). OFF by
+# default: nobody needs LibTorch installed to build or run this package.
+# Turn on with, e.g.:
+#   colcon build --packages-select nav2_tgmppi_controller --symlink-install \
+#     --cmake-args -DTGMPPI_WITH_CUDA=ON \
+#     -DCMAKE_PREFIX_PATH=$HOME/libtorch_cu126/libtorch \
+#     -DCMAKE_CUDA_COMPILER=/usr/local/cuda-12.6/bin/nvcc
+# and make sure $HOME/libtorch_cu126/libtorch/lib is on LD_LIBRARY_PATH
+# whenever you launch Nav2 (this is a runtime dlopen dependency of the
+# plugin .so, not just a build-time one).
+option(TGMPPI_WITH_CUDA "Build the optional LibTorch/CUDA compute_backend" OFF)
+if(TGMPPI_WITH_CUDA)
+  find_package(Torch REQUIRED)
+endif()
+
 include_directories(
   include
 )
@@ -76,10 +91,15 @@ add_library(tgmppi_controller SHARED
   src/path_handler.cpp
   src/parameters_handler.cpp
   src/noise_generator.cpp
+  src/tools/gpu_rollout.cpp
 )
 
 add_library(tgmppi_critics SHARED
   src/flow_field.cpp
+  src/tools/gpu_cost_critic.cpp
+  src/tools/gpu_goal_critic.cpp
+  src/tools/gpu_flow_field_critic.cpp
+  src/tools/gpu_elementwise_critics.cpp
   src/critics/obstacles_critic.cpp
   src/critics/cost_critic.cpp
   src/critics/goal_critic.cpp
@@ -102,6 +122,13 @@ foreach(lib IN LISTS libraries)
   target_link_libraries(${lib} xtensor xtensor::optimize xtensor::use_xsimd)
   ament_target_dependencies(${lib} ${dependencies_pkgs})
 endforeach()
+
+if(TGMPPI_WITH_CUDA)
+  foreach(lib IN LISTS libraries)
+    target_compile_definitions(${lib} PUBLIC TGMPPI_WITH_CUDA)
+    target_link_libraries(${lib} "${TORCH_LIBRARIES}")
+  endforeach()
+endif()
 
 install(TARGETS tgmppi_controller tgmppi_critics
   ARCHIVE DESTINATION lib

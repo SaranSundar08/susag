@@ -24,6 +24,9 @@
 #include "nav2_tgmppi_controller/critic_function.hpp"
 #include "nav2_tgmppi_controller/models/state.hpp"
 #include "nav2_tgmppi_controller/tools/utils.hpp"
+#ifdef TGMPPI_WITH_CUDA
+#include "nav2_tgmppi_controller/tools/gpu_cost_critic.hpp"
+#endif
 
 namespace tgmppi::critics
 {
@@ -91,6 +94,12 @@ protected:
   std::string inflation_layer_name_;
 
   unsigned int power_{0};
+
+#ifdef TGMPPI_WITH_CUDA
+  // compute_backend:"cuda" -- only ever used when !consider_footprint_
+  // (circular checking); footprint mode always uses the CPU path above.
+  GpuCostCritic gpu_critic_;
+#endif
 };
 
 }  // namespace tgmppi::critics

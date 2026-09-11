@@ -18,6 +18,9 @@
 #include "nav2_tgmppi_controller/critic_function.hpp"
 #include "nav2_tgmppi_controller/models/state.hpp"
 #include "nav2_tgmppi_controller/tools/utils.hpp"
+#ifdef TGMPPI_WITH_CUDA
+#include "nav2_tgmppi_controller/tools/gpu_elementwise_critics.hpp"
+#endif
 
 namespace tgmppi::critics
 {
@@ -49,6 +52,10 @@ protected:
   float weight_{0};
   float min_vel_;
   float max_vel_;
+
+#ifdef TGMPPI_WITH_CUDA
+  GpuElementwiseCritics gpu_critics_;
+#endif
 };
 
 }  // namespace tgmppi::critics

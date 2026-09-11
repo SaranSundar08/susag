@@ -15,6 +15,10 @@
 #include "nav2_tgmppi_controller/critics/flow_field_critic.hpp"
 
 #include <cmath>
+#ifdef TGMPPI_WITH_CUDA
+#include <cstring>
+#include "nav2_tgmppi_controller/tools/gpu_rollout.hpp"
+#endif
 
 #include "nav2_tgmppi_controller/tools/flow_field.hpp"
 
@@ -32,6 +36,10 @@ void FlowFieldCritic::initialize()
   RCLCPP_INFO(
     logger_, "FlowFieldCritic instantiated with %d power, %f weight, "
     "%f running weight.", power_, weight_, running_weight_);
+
+#ifdef TGMPPI_WITH_CUDA
+  gpu_critic_.initialize();
+#endif
 }
 
 void FlowFieldCritic::score(CriticData & data)
@@ -40,6 +48,30 @@ void FlowFieldCritic::score(CriticData & data)
     return;  // ray mode or no field yet -> defer to the other critics
   }
   const FlowField & ff = *data.flow_field;
+
+#ifdef TGMPPI_WITH_CUDA
+  if (data.compute_backend == "cuda" && gpu_critic_.ready()) {
+    auto cost_out = xt::xtensor<float, 1>::from_shape({data.costs.shape(0)});
+    if (data.gpu_rollout != nullptr) {
+      // Chained: reads the rollout's already-resident trajectory tensors
+      // directly, uploading only the flow field's own grid (which the
+      // rollout has no reason to already have).
+      const auto * rollout = static_cast<const GpuRollout *>(data.gpu_rollout);
+      auto grid = GpuFlowFieldCritic::uploadGrid(ff);
+      auto cost_gpu = gpu_critic_.computeDevice(
+        rollout->trajX(), rollout->trajY(), grid, ff.sizeX(), ff.sizeY(),
+        ff.originX(), ff.originY(), ff.resolution(), ff.dmax(),
+        weight_, running_weight_, power_);
+      auto cost_cpu = cost_gpu.to(torch::kCPU).contiguous();
+      std::memcpy(
+        cost_out.data(), cost_cpu.data_ptr<float>(), cost_out.size() * sizeof(float));
+    } else {
+      gpu_critic_.score(data.trajectories, ff, weight_, running_weight_, power_, cost_out);
+    }
+    data.costs += cost_out;
+    return;
+  }
+#endif
 
   const auto & traj_x = data.trajectories.x;
   const auto & traj_y = data.trajectories.y;
